@@ -22,6 +22,7 @@ namespace GameArchitectureEngine
         /// which is read from file name and then used to reference them
         /// </summary>
         #region publics
+        //either have a dictionary of these dictionaries or a list so initialising and disposing of them is easy
         public Dictionary<string, Texture2D> SpriteSheets;
         public Dictionary<string, Texture2D> TileSheets;
         public Dictionary<string, Texture2D> Overlays;
@@ -160,12 +161,7 @@ namespace GameArchitectureEngine
         ///</summary>
         public void LoadContent(ContentManager Content, GraphicsDevice graphicsDevice)
         {
-            string directory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-
-            //Console.WriteLine("TEST:" + directory);
-
-            DirectorySearch(directory);
-
+            //Initialise the dictionaries
             TileSheets = new Dictionary<string, Texture2D>();
             SpriteSheets = new Dictionary<string, Texture2D>();
             SFX = new Dictionary<string, SoundEffect>();
@@ -173,18 +169,31 @@ namespace GameArchitectureEngine
             Fonts = new Dictionary<string, SpriteFont>();
             Overlays = new Dictionary<string, Texture2D>();
 
+            //Get current working directory
+            string directory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+
+            //List the files
+            DirectorySearch(directory);
+            
+            //Add files to dictionaries
             addAssetsToDictionaries(completePaths, Content);
-            //replace with arrays of texture2d's etc
+            
             spriteBatch = new SpriteBatch(graphicsDevice);
 
-            hudFont = Content.Load<SpriteFont>("Fonts/Hud");
+            //hudFont = Content.Load<SpriteFont>("Fonts/Hud");
 
-            failureOverlay = Content.Load<Texture2D>("Overlays/Failure");
+            //failureOverlay = Content.Load<Texture2D>("Overlays/Failure");
 
-            playerWalk = Content.Load<Texture2D>("Sprites/Player/WalkSpriteSheet");
-            playerSwordSwing = Content.Load<Texture2D>("Sprites/Player/Swordswing");
+            //playerWalk = Content.Load<Texture2D>("Sprites/Player/WalkSpriteSheet");
+            //playerSwordSwing = Content.Load<Texture2D>("Sprites/Player/Swordswing");
 
-            tileSet = Content.Load<Texture2D>("TileSheet/Terrains");
+            //tileSet = Content.Load<Texture2D>("TileSheet/Terrains");
+        }
+
+        public void UnloadContent(ContentManager Content)
+        {
+            //Is it really this easy?
+            Content.Unload();
         }
 
         /// <summary>
@@ -240,10 +249,12 @@ namespace GameArchitectureEngine
                 }
                 else if (path.Contains(sprites))
                 {
+                    SpriteSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                     Console.WriteLine("sprites found: " + cleanedPath);
                 }
                 else if (path.Contains(fonts))
                 {
+                    Fonts.Add(cleanedPath, Content.Load<SpriteFont>(cleanedPath));
                     Console.WriteLine("fonts found: " + cleanedPath);
                 }
                 else if (path.Contains(maps))
@@ -252,14 +263,17 @@ namespace GameArchitectureEngine
                 }
                 else if (path.Contains(overlays))
                 {
+                    Overlays.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                     Console.WriteLine("overlays found: " + cleanedPath);
                 }
                 else if (path.Contains(sounds))
                 {
+                    SFX.Add(cleanedPath, Content.Load<SoundEffect>(cleanedPath));
                     Console.WriteLine("sounds found: " + cleanedPath);
                 }
                 else if (path.Contains(songs))
                 {
+                    Songs.Add(cleanedPath, Content.Load<Song>(cleanedPath));
                     Console.WriteLine("songs found: " + cleanedPath);
                 }
                 else

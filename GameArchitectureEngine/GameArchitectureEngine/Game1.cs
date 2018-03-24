@@ -119,7 +119,8 @@ namespace GameArchitectureEngine
 
             messageColour = Color.Gray;
 
-            DrawShadowedString(Resources.HudFont, message, hudLocation, messageColour);
+            //Passing in the path is acceptible? seems a bit clunky
+            DrawShadowedString(Resources.Fonts["Fonts/Hud"], message, hudLocation, messageColour);
 
         }
 
