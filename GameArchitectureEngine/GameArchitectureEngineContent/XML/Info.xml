@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<GameInfo>  
+  <GameObjectBase>
+    <Position>
+      <X>0</X>
+      <Y>0</Y>
+    </Position>
+    <Rotation>0.0</Rotation>
+    <Type>PlayerGameObject</Type>
+  </GameObjectBase>
+</GameInfo>
