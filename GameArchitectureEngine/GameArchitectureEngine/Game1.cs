@@ -20,6 +20,7 @@ namespace GameArchitectureEngine
         GraphicsDeviceManager graphics;
         
         ResourceManager Resources;
+        CommandManager Commands;
 
         public ActionRPG()
         {
@@ -36,8 +37,12 @@ namespace GameArchitectureEngine
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            Resources = new ResourceManager();
+            Commands = new CommandManager();
 
             base.Initialize();
+
+            InitialiseBindings();
         }
 
         /// <summary>
@@ -47,7 +52,7 @@ namespace GameArchitectureEngine
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            Resources = new ResourceManager();
+            
 
             Resources.LoadContent(Content, GraphicsDevice);
 
@@ -84,6 +89,8 @@ namespace GameArchitectureEngine
                 this.Exit();
 
             // TODO: Add your update logic here
+            Commands.Update();
+
 
             base.Update(gameTime);
         }
@@ -128,6 +135,19 @@ namespace GameArchitectureEngine
         {
             Resources.SprBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
             Resources.SprBatch.DrawString(font, value, position, colour);
+        }
+
+        private void InitialiseBindings()
+        {
+            Commands.AddKeyboardBindings(Keys.Escape, StopGame);
+        }
+
+        public void StopGame(eButtonState buttonState, Vector2 amount)
+        {
+            if (buttonState == eButtonState.DOWN)
+            {
+                Exit();
+            }
         }
     }
 }
