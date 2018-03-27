@@ -22,6 +22,8 @@ namespace GameArchitectureEngine
         ResourceManager Resources;
         CommandManager Commands;
 
+        PlayerGameObject player;
+
         public ActionRPG()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -40,6 +42,9 @@ namespace GameArchitectureEngine
             Resources = new ResourceManager();
             Commands = new CommandManager();
 
+            player = new PlayerGameObject();
+
+        
             base.Initialize();
 
             InitialiseBindings();
@@ -55,6 +60,7 @@ namespace GameArchitectureEngine
             
 
             Resources.LoadContent(Content, GraphicsDevice);
+            player.LoadContent(Resources);
 
             using (Stream fileStream = TitleContainer.OpenStream(@"Content/XML/info.xml"))
             {
@@ -75,6 +81,7 @@ namespace GameArchitectureEngine
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            Resources.UnloadContent(Content);
         }
 
         /// <summary>
@@ -90,7 +97,7 @@ namespace GameArchitectureEngine
 
             // TODO: Add your update logic here
             Commands.Update();
-
+            player.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -105,6 +112,8 @@ namespace GameArchitectureEngine
 
             // TODO: Add your drawing code here
             Resources.SprBatch.Begin();
+
+            player.Draw(gameTime, Resources.SprBatch);
 
             DrawHUD();
 

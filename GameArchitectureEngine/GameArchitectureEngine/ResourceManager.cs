@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 namespace GameArchitectureEngine
 {
-    class ResourceManager
+    public class ResourceManager
     {
         /// <summary>
         /// TODO
@@ -70,85 +70,85 @@ namespace GameArchitectureEngine
             get { return spriteBatch; }
         }
 
-        public SpriteFont HudFont
-        {
-            get { return hudFont; }
-        }
-
-        public Texture2D SuccessOverlay
-        {
-            get { return successOverlay; }
-        }
-
-        public Texture2D PauseOverlay
-        {
-            get { return pauseOverlay; }
-        }
-
-        public Texture2D FailureOverlay
-        {
-            get { return failureOverlay; }
-        }
-
-        public Texture2D PlayerIdle
-        {
-            get { return playerIdle; }
-        }
-
-        public Texture2D PlayerWalk
-        {
-            get { return playerWalk; }
-        }
-
-        public Texture2D PlayerAttack
-        {
-            get { return playerAttack; }
-        }
-
-        public Texture2D PlayerDie
-        {
-            get { return playerDie; }
-        }
-
-        public Texture2D PlayerSwordSwing
-        {
-            get { return playerSwordSwing; }
-        }
-
-        public Texture2D Enemy1Idle
-        {
-            get { return enemy1Idle; }
-        }
-
-        public Texture2D Enemy1Walk
-        {
-            get { return enemy1Walk; }
-        }
-
-        public Texture2D Enemy1Attack
-        {
-            get { return enemy1Attack; }
-        }
-
-        public Texture2D Enemy1Die
-        {
-            get { return enemy1Die; }
-        }
-
-        public Texture2D TileSet
-        {
-            get { return tileSet; }
-        }
-
-        public int NumberOfLevels
-        {
-            get { return numberOfLevels; }
-        }
-
-        //public Song[] Songs
+        //public SpriteFont HudFont
         //{
-        //    get { return songs; }
+        //    get { return hudFont; }
         //}
+
+        //public Texture2D SuccessOverlay
+        //{
+        //    get { return successOverlay; }
+        //}
+
+        //public Texture2D PauseOverlay
+        //{
+        //    get { return pauseOverlay; }
+        //}
+
+        //public Texture2D FailureOverlay
+        //{
+        //    get { return failureOverlay; }
+        //}
+
+        //public Texture2D PlayerIdle
+        //{
+        //    get { return playerIdle; }
+        //}
+
+        //public Texture2D PlayerWalk
+        //{
+        //    get { return playerWalk; }
+        //}
+
+        //public Texture2D PlayerAttack
+        //{
+        //    get { return playerAttack; }
+        //}
+
+        //public Texture2D PlayerDie
+        //{
+        //    get { return playerDie; }
+        //}
+
+        //public Texture2D PlayerSwordSwing
+        //{
+        //    get { return playerSwordSwing; }
+        //}
+
+        //public Texture2D Enemy1Idle
+        //{
+        //    get { return enemy1Idle; }
+        //}
+
+        //public Texture2D Enemy1Walk
+        //{
+        //    get { return enemy1Walk; }
+        //}
+
+        //public Texture2D Enemy1Attack
+        //{
+        //    get { return enemy1Attack; }
+        //}
+
+        //public Texture2D Enemy1Die
+        //{
+        //    get { return enemy1Die; }
+        //}
+
+        //public Texture2D TileSet
+        //{
+        //    get { return tileSet; }
+        //}
+
+        //public int NumberOfLevels
+        //{
+        //    get { return numberOfLevels; }
+        //}
+
+        ////public Song[] Songs
+        ////{
+        ////    get { return songs; }
+        ////}
 
         public SoundEffect[] Sfx
         {
@@ -245,7 +245,7 @@ namespace GameArchitectureEngine
                 if (path.Contains(tileSheet))
                 {                    
                     TileSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
-                    Console.WriteLine("Asset loaded to dictionary: " + TileSheets[cleanedPath].ToString());
+                    //Console.WriteLine("Asset loaded to dictionary: " + TileSheets[cleanedPath].ToString());
                 }
                 else if (path.Contains(sprites))
                 {
@@ -255,26 +255,26 @@ namespace GameArchitectureEngine
                 else if (path.Contains(fonts))
                 {
                     Fonts.Add(cleanedPath, Content.Load<SpriteFont>(cleanedPath));
-                    Console.WriteLine("fonts found: " + cleanedPath);
+                    //Console.WriteLine("fonts found: " + cleanedPath);
                 }
                 else if (path.Contains(maps))
                 {
-                    Console.WriteLine("maps found: " + cleanedPath);
+                    //Console.WriteLine("maps found: " + cleanedPath);
                 }
                 else if (path.Contains(overlays))
                 {
                     Overlays.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
-                    Console.WriteLine("overlays found: " + cleanedPath);
+                    //Console.WriteLine("overlays found: " + cleanedPath);
                 }
                 else if (path.Contains(sounds))
                 {
                     SFX.Add(cleanedPath, Content.Load<SoundEffect>(cleanedPath));
-                    Console.WriteLine("sounds found: " + cleanedPath);
+                    //Console.WriteLine("sounds found: " + cleanedPath);
                 }
                 else if (path.Contains(songs))
                 {
                     Songs.Add(cleanedPath, Content.Load<Song>(cleanedPath));
-                    Console.WriteLine("songs found: " + cleanedPath);
+                    //Console.WriteLine("songs found: " + cleanedPath);
                 }
                 else
                 {

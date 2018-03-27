@@ -72,6 +72,8 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation.cs" />
+    <Compile Include="AnimationPlayer.cs" />
     <Compile Include="ButtonState.cs" />
     <Compile Include="CommandManager.cs" />
     <Compile Include="FileLoader.cs" />
