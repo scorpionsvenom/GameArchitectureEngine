@@ -24,6 +24,8 @@ namespace GameArchitectureEngine
 
         PlayerGameObject player;
 
+        SpriteBatch spriteBatch;
+
         public ActionRPG()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -56,21 +58,19 @@ namespace GameArchitectureEngine
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            
-
+            spriteBatch = new SpriteBatch(GraphicsDevice);
             Resources.LoadContent(Content, GraphicsDevice);
             player.LoadContent(Resources);
 
-            using (Stream fileStream = TitleContainer.OpenStream(@"Content/XML/info.xml"))
-            {
-                FileLoader fileLoader = new FileLoader(fileStream);
+            //using (Stream fileStream = TitleContainer.OpenStream(@"Content/XML/info.xml"))
+            //{
+            //    FileLoader fileLoader = new FileLoader(fileStream);
 
-                fileLoader.ReadXML(@"Content/XML/info.xml");
+            //    fileLoader.ReadXML(@"Content/XML/info.xml");
 
-                Console.WriteLine("Position: {0}, {1}", GameInfo.Instance.GameObjectBase.Position.X, GameInfo.Instance.GameObjectBase.Position.Y);
-                Console.WriteLine("Rotation: {0}", GameInfo.Instance.GameObjectBase.Rotation);
-            }
+            //    Console.WriteLine("Position: {0}, {1}", GameInfo.Instance.GameObjectBase.Position.X, GameInfo.Instance.GameObjectBase.Position.Y);
+            //    Console.WriteLine("Rotation: {0}", GameInfo.Instance.GameObjectBase.Rotation);
+            //}
             // TODO: use this.Content to load your game content here
         }
 
@@ -92,8 +92,8 @@ namespace GameArchitectureEngine
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            //    this.Exit();
 
             // TODO: Add your update logic here
             Commands.Update();
@@ -108,17 +108,18 @@ namespace GameArchitectureEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Gray);
 
             // TODO: Add your drawing code here
-            Resources.SprBatch.Begin();
+            //Resources.SprBatch.Begin();
+            spriteBatch.Begin();
 
-            player.Draw(gameTime, Resources.SprBatch);
+            player.Draw(gameTime, spriteBatch);
 
             DrawHUD();
 
-            Resources.SprBatch.End();
-
+            //Resources.SprBatch.End();
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
@@ -142,8 +143,10 @@ namespace GameArchitectureEngine
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color colour)
         {
-            Resources.SprBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
-            Resources.SprBatch.DrawString(font, value, position, colour);
+            //Resources.SprBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
+            //Resources.SprBatch.DrawString(font, value, position, colour);
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
+            spriteBatch.DrawString(font, value, position, colour);
         }
 
         private void InitialiseBindings()

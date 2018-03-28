@@ -60,12 +60,12 @@ namespace GameArchitectureEngine
             Resources = resources;
 
             //Too specific, i think this class shouldn't need to know so many specifics, they should be passed in
-            walkAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/WalkSpriteSheet"],0.5f, true);
+            walkAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/WalkSpriteSheet"],0.1f, true);
             sprite.PlayAnimation(walkAnimation);
 
             int width = (int)(walkAnimation.FrameWidth * 0.4f);
             int left = (walkAnimation.FrameWidth - width) / 2;
-            int height = (int)(walkAnimation.FrameWidth * 0.8);
+            int height = (int)(walkAnimation.FrameHeight * 0.8);
             int top = walkAnimation.FrameHeight - height;
             localBounds = new Rectangle(left, top, width, height);
 
