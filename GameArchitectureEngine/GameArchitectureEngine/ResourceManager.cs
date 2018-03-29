@@ -62,6 +62,8 @@ namespace GameArchitectureEngine
 
         private Song[] songs;
         private SoundEffect[] sfx;
+
+        private GraphicsDevice graphicsDevice;
         #endregion
 
         #region Accessors
@@ -70,6 +72,10 @@ namespace GameArchitectureEngine
             get { return spriteBatch; }
         }
 
+        public GraphicsDevice GraphicsDevice
+        {
+            get { return graphicsDevice; }
+        }
         //public SpriteFont HudFont
         //{
         //    get { return hudFont; }
@@ -177,8 +183,10 @@ namespace GameArchitectureEngine
             
             //Add files to dictionaries
             addAssetsToDictionaries(completePaths, Content);
-            
-            spriteBatch = new SpriteBatch(graphicsDevice);
+
+            this.graphicsDevice = graphicsDevice;
+            //spriteBatch = new SpriteBatch(graphicsDevice);
+
 
             //hudFont = Content.Load<SpriteFont>("Fonts/Hud");
 
@@ -250,7 +258,7 @@ namespace GameArchitectureEngine
                 else if (path.Contains(sprites))
                 {
                     SpriteSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
-                    Console.WriteLine("sprites found: " + cleanedPath);
+                    //Console.WriteLine("sprites found: " + cleanedPath);
                 }
                 else if (path.Contains(fonts))
                 {
@@ -279,7 +287,7 @@ namespace GameArchitectureEngine
                 else
                 {
                     //Throw a wobbly
-                    Console.WriteLine("Not found it: " + path);
+                    //Console.WriteLine("Not found it: " + path);
                 }              
             }
         }

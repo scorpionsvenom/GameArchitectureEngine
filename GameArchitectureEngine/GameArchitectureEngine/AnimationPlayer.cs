@@ -44,7 +44,8 @@ namespace GameArchitectureEngine
                 throw new NotSupportedException("No animation is currently playing");
 
             time += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            while (time > Animation.FrameTime)
+
+            if (time > Animation.FrameTime)
             {
                 time -= Animation.FrameTime;
 
@@ -56,11 +57,11 @@ namespace GameArchitectureEngine
                 {
                     frameIndex = Math.Min(frameIndex + 1, Animation.FrameCount - 1);
                 }
-
-                Rectangle source = new Rectangle(FrameIndex * Animation.Texture.Height, 0, Animation.Texture.Height, Animation.Texture.Height);
-
-                spriteBatch.Draw(Animation.Texture, position, source, Color.White, 0.0f, Origin, 1.0f, spriteEffects, 0.0f);
             }
+
+            Rectangle source = new Rectangle(FrameIndex * Animation.Texture.Height, 0, Animation.Texture.Height, Animation.Texture.Height);
+
+            spriteBatch.Draw(Animation.Texture, position, source, Color.White, 0.0f, Origin, 1.0f, spriteEffects, 0.0f);
         }
     }
 }

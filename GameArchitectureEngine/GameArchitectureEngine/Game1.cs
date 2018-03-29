@@ -152,6 +152,8 @@ namespace GameArchitectureEngine
         private void InitialiseBindings()
         {
             Commands.AddKeyboardBindings(Keys.Escape, StopGame);
+            Commands.AddKeyboardBindings(Keys.Up, MoveUp);
+            Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
         }
 
         public void StopGame(eButtonState buttonState, Vector2 amount)
@@ -159,6 +161,14 @@ namespace GameArchitectureEngine
             if (buttonState == eButtonState.DOWN)
             {
                 Exit();
+            }
+        }
+
+        public void MoveUp(eButtonState buttonState, Vector2 amount)
+        {
+            if (buttonState == eButtonState.DOWN)
+            {
+
             }
         }
     }

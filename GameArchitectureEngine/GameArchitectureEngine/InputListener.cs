@@ -12,17 +12,28 @@ namespace GameArchitectureEngine
         private KeyboardState PrevKeyboardState { get; set; }
         private KeyboardState CurrentKeyboardState { get; set; }
 
+        private MouseState PrevMouseState { get; set; }
+        private MouseState CurrentMouseState { get; set; }
+
         public HashSet<Keys> KeyList;
+        public HashSet<MouseButton> MouseButtonList;
 
         public event EventHandler<KeyboardEventArgs> OnKeyDown = delegate { };
         public event EventHandler<KeyboardEventArgs> OnKeyPressed = delegate { };
         public event EventHandler<KeyboardEventArgs> OnKeyUp = delegate { };
 
+        public event EventHandler<MouseEventArgs> OnMouseButtonDown = delegate { };
+
         public InputListener()
         {
             CurrentKeyboardState = Keyboard.GetState();
             PrevKeyboardState = CurrentKeyboardState;
+
+            CurrentMouseState = Mouse.GetState();
+            PrevMouseState = CurrentMouseState;
+
             KeyList = new HashSet<Keys>();
+            MouseButtonList = new HashSet<MouseButton>();
         }
 
         public void AddKey(Keys key)
@@ -30,12 +41,21 @@ namespace GameArchitectureEngine
             KeyList.Add(key);
         }
 
+        public void AddButton(MouseButton button)
+        {
+            MouseButtonList.Add(button);
+        }
+
         public void Update()
         {
             PrevKeyboardState = CurrentKeyboardState;
             CurrentKeyboardState = Keyboard.GetState();
 
+            PrevMouseState = CurrentMouseState;
+            CurrentMouseState = Mouse.GetState();
+
             FireKeyboardEvents();
+            FireMouseEvents();
         }
 
         private void FireKeyboardEvents()
@@ -59,7 +79,22 @@ namespace GameArchitectureEngine
                     if (OnKeyPressed != null)
                         OnKeyPressed(this, new KeyboardEventArgs(key, CurrentKeyboardState, PrevKeyboardState));
                 }
-            }
+            }            
+        }
+
+        private void FireMouseEvents()
+        {
+            foreach (MouseButton button in MouseButtonList)
+            {
+                if (button == MouseButton.LEFT)
+                {
+                    if (CurrentMouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        if (OnMouseButtonDown != null)
+                            OnMouseButtonDown(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+                }
+            }           
         }
     }
 }
