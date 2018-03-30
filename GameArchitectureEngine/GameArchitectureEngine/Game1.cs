@@ -46,7 +46,8 @@ namespace GameArchitectureEngine
 
             player = new PlayerGameObject();
 
-        
+            this.IsMouseVisible = true;
+
             base.Initialize();
 
             InitialiseBindings();

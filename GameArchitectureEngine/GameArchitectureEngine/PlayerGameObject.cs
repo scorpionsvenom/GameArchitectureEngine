@@ -20,6 +20,9 @@ namespace GameArchitectureEngine
 
         private bool isAlive = true;
 
+        private Vector2 lastMouseLocation = Vector2.Zero;
+        private float stoppingDistance = 3.0f;
+
         public Vector2 Velocity
         {
             get { return velocity; }
@@ -84,6 +87,11 @@ namespace GameArchitectureEngine
             if (isAlive)
                 sprite.PlayAnimation(walkAnimation);
             //else
+
+            if (Vector2.Distance(lastMouseLocation, Position) < stoppingDistance)
+                velocity = Vector2.Zero;
+            else
+                Position += velocity;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -105,25 +113,20 @@ namespace GameArchitectureEngine
         {
             if (buttonState == eButtonState.DOWN)
             {
-                Console.WriteLine("Move towards called");
-                Vector2 playerLocation = Position;
-
-                Console.WriteLine("playerLocation {0}", playerLocation);
-
                 Rectangle safeArea = Resources.GraphicsDevice.Viewport.TitleSafeArea;
                 
                 if (IsVectorInsideWindow(mouseLocation, Resources.GraphicsDevice))
                 {
-                    //calculate the direction in which to move
-                    Vector2 direction = playerLocation - mouseLocation;
-                    Console.WriteLine("direction {0}", direction);
-                    direction.Normalize();
-                    Console.WriteLine("direction {0}", direction);
-                    direction *= speed;
+                    lastMouseLocation = mouseLocation;
 
-                    playerLocation += direction;
-                    Console.WriteLine("new playerLocation: {0}", playerLocation);
-                    Position = playerLocation;
+                    //calculate the direction in which to move
+                    Vector2 direction = mouseLocation - Position;
+                    direction.Normalize();
+
+                    float distance = Vector2.Distance(Position, mouseLocation);
+                    direction *= Math.Min(speed, distance);
+
+                    Velocity = direction;
                 }
             }
         }

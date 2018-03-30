@@ -67,8 +67,8 @@ namespace GameArchitectureEngine
             GameAction action = m_MouseButtonBindings[e.Button];
 
             if (action != null)
-            {
-                action(eButtonState.DOWN, new Vector2(1.0f));
+            {                
+                action(eButtonState.DOWN, new Vector2(Mouse.GetState().X, Mouse.GetState().Y));
             }
         }
 
