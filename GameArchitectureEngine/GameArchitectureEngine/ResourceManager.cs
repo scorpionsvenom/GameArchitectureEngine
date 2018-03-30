@@ -29,7 +29,7 @@ namespace GameArchitectureEngine
         public Dictionary<string, SpriteFont> Fonts;
         public Dictionary<string, SoundEffect> SFX;
         public Dictionary<string, Song> Songs;
-        //public Dictionary<string, Map> Maps;
+        //public Dictionary<string, Map> Maps;        
 
         #endregion
 
@@ -64,6 +64,9 @@ namespace GameArchitectureEngine
         private SoundEffect[] sfx;
 
         private GraphicsDevice graphicsDevice;
+
+        private FileLoader fileLoader;
+        private Stream fileStream;
         #endregion
 
         #region Accessors
@@ -185,6 +188,8 @@ namespace GameArchitectureEngine
             addAssetsToDictionaries(completePaths, Content);
 
             this.graphicsDevice = graphicsDevice;
+
+            fileStream = new Stream()
             //spriteBatch = new SpriteBatch(graphicsDevice);
 
 
