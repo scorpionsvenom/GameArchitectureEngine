@@ -66,7 +66,9 @@ namespace GameArchitectureEngine
         private GraphicsDevice graphicsDevice;
 
         private FileLoader fileLoader;
-        private Stream fileStream;
+        private FileStream fileStream;
+
+        int extensionLength = 4;
         #endregion
 
         #region Accessors
@@ -183,24 +185,13 @@ namespace GameArchitectureEngine
 
             //List the files
             DirectorySearch(directory);
-            
+
             //Add files to dictionaries
             addAssetsToDictionaries(completePaths, Content);
 
             this.graphicsDevice = graphicsDevice;
 
-            fileStream = new Stream()
-            //spriteBatch = new SpriteBatch(graphicsDevice);
-
-
-            //hudFont = Content.Load<SpriteFont>("Fonts/Hud");
-
-            //failureOverlay = Content.Load<Texture2D>("Overlays/Failure");
-
-            //playerWalk = Content.Load<Texture2D>("Sprites/Player/WalkSpriteSheet");
-            //playerSwordSwing = Content.Load<Texture2D>("Sprites/Player/Swordswing");
-
-            //tileSet = Content.Load<Texture2D>("TileSheet/Terrains");
+            //fileStream = new FileStream();            
         }
 
         public void UnloadContent(ContentManager Content)
@@ -228,7 +219,7 @@ namespace GameArchitectureEngine
                     DirectorySearch(dir);
                 }
             }
-            catch(System.Exception e)
+            catch (System.Exception e)
             {
                 Console.WriteLine("ERROR: " + e.Message);
             }
@@ -239,7 +230,7 @@ namespace GameArchitectureEngine
             string cleanedPath;
             string searchStringContent = @"Content\";
             int length = searchStringContent.Length;
-            int extensionLength = 4; //length of .xnb
+             //length of .xnb
 
             string tileSheet = "TileSheet";
             string fonts = "Fonts";
@@ -249,14 +240,15 @@ namespace GameArchitectureEngine
             string sounds = "Sounds";
             string songs = "Songs";
 
-            foreach(string path in paths)
+            foreach (string path in paths)
             {
-                cleanedPath = path.Substring(path.IndexOf(searchStringContent) + length);
-                cleanedPath = cleanedPath.Substring(0, cleanedPath.Length - extensionLength);
-                cleanedPath = cleanedPath.Replace(@"\", "/");
+                cleanedPath = CleanPath(path.Substring(path.IndexOf(searchStringContent) + length));
+                //cleanedPath = path.Substring(path.IndexOf(searchStringContent) + length);
+                //cleanedPath = cleanedPath.Substring(0, cleanedPath.Length - extensionLength);
+                //cleanedPath = cleanedPath.Replace(@"\", "/");
 
                 if (path.Contains(tileSheet))
-                {                    
+                {
                     TileSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                     //Console.WriteLine("Asset loaded to dictionary: " + TileSheets[cleanedPath].ToString());
                 }
@@ -272,6 +264,15 @@ namespace GameArchitectureEngine
                 }
                 else if (path.Contains(maps))
                 {
+                    fileLoader = new FileLoader();
+
+                    Map map = fileLoader.ReadMap(path/*.Substring(path.IndexOf("Content"))*/);
+
+                    for (int i = 0; i < map.MapList.Count; i++)
+                    {
+                        foreach (string s in map.MapList[i])
+                            Console.WriteLine("line {0}: " + s + ",", i);
+                    }
                     //Console.WriteLine("maps found: " + cleanedPath);
                 }
                 else if (path.Contains(overlays))
@@ -293,8 +294,22 @@ namespace GameArchitectureEngine
                 {
                     //Throw a wobbly
                     //Console.WriteLine("Not found it: " + path);
-                }              
+                }
             }
+        }
+
+        public void LoadMap(string filename)
+        {            
+            filename = filename.Substring(filename.IndexOf("Content")); 
+        }
+
+        public string CleanPath(string path)
+        {
+            string cleanedPath = path;
+            cleanedPath = cleanedPath.Substring(0, cleanedPath.Length - extensionLength);
+            cleanedPath = cleanedPath.Replace(@"\", "/");
+
+            return cleanedPath;
         }
     }
 }

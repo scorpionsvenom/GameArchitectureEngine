@@ -81,6 +81,7 @@
     <Compile Include="GameObjectBase.cs" />
     <Compile Include="InputListener.cs" />
     <Compile Include="KeyboardEventArgs.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="MapManager.cs" />
     <Compile Include="MouseEventArgs.cs" />
     <Compile Include="PlayerGameObject.cs" />
