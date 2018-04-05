@@ -10,8 +10,8 @@ namespace GameArchitectureEngine
         Impassable = 1,
         Platform = 2,
     }
-    
-    enum MapTileType
+
+    enum enumMapTileType
     {
         Earth = 0,
         Grass = 1,

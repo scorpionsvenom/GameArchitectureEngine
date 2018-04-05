@@ -240,12 +240,10 @@ namespace GameArchitectureEngine
             string sounds = "Sounds";
             string songs = "Songs";
 
+            //TODO make this less reliant on the game programmer remembering to include all these types of asshats!!! maybe just some error checking            
             foreach (string path in paths)
             {
                 cleanedPath = CleanPath(path.Substring(path.IndexOf(searchStringContent) + length));
-                //cleanedPath = path.Substring(path.IndexOf(searchStringContent) + length);
-                //cleanedPath = cleanedPath.Substring(0, cleanedPath.Length - extensionLength);
-                //cleanedPath = cleanedPath.Replace(@"\", "/");
 
                 if (path.Contains(tileSheet))
                 {
@@ -268,13 +266,7 @@ namespace GameArchitectureEngine
 
                     Map map = fileLoader.ReadMap(path/*.Substring(path.IndexOf("Content"))*/);
 
-                    Maps.Add(cleanedPath, map);
-                    //for (int i = 0; i < map.MapList.Count; i++)
-                    //{
-                    //    foreach (string s in map.MapList[i])
-                    //        Console.WriteLine("line {0}: " + s + ",", i);
-                    //}
-                    //Console.WriteLine("maps found: " + cleanedPath);
+                    Maps.Add(cleanedPath, map);                    
                 }
                 else if (path.Contains(overlays))
                 {

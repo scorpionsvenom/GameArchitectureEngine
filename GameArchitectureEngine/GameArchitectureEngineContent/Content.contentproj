@@ -54,8 +54,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TileSheet\Terrains.png">
-      <Name>Terrains</Name>
+    <Compile Include="TileSheet\0.png">
+      <Name>0</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -69,10 +69,25 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Sounds\" />
+    <Folder Include="Sprites\Environment\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Sprites\Player\WalkSpriteSheet.png">
       <Name>WalkSpriteSheet</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Enemies\EnemyIdle.png">
+      <Name>EnemyIdle</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Powerups\Potion.png">
+      <Name>Potion</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

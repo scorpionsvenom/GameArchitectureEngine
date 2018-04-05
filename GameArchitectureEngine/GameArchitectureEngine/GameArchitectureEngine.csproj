@@ -16,7 +16,7 @@
     <XnaProfile>Reach</XnaProfile>
     <XnaCrossPlatformGroupID>0638046a-bb3e-44b9-93a1-e15c699e658a</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
-    <ApplicationIcon>Game.ico</ApplicationIcon>
+    <ApplicationIcon>Game\Game.ico</ApplicationIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -72,27 +72,27 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animation.cs" />
-    <Compile Include="AnimationPlayer.cs" />
-    <Compile Include="ButtonState.cs" />
-    <Compile Include="CommandManager.cs" />
-    <Compile Include="FileLoader.cs" />
-    <Compile Include="GameInfo.cs" />
-    <Compile Include="GameObjectBase.cs" />
-    <Compile Include="InputListener.cs" />
-    <Compile Include="KeyboardEventArgs.cs" />
-    <Compile Include="Map.cs" />
-    <Compile Include="MapManager.cs" />
-    <Compile Include="MouseEventArgs.cs" />
-    <Compile Include="PlayerGameObject.cs" />
+    <Compile Include="Engine\Animation.cs" />
+    <Compile Include="Engine\AnimationPlayer.cs" />
+    <Compile Include="Engine\ButtonState.cs" />
+    <Compile Include="Engine\CommandManager.cs" />
+    <Compile Include="Engine\FileLoader.cs" />
+    <Compile Include="Game\GameInfo.cs" />
+    <Compile Include="Game\GameObjectBase.cs" />
+    <Compile Include="Engine\InputListener.cs" />
+    <Compile Include="Engine\KeyboardEventArgs.cs" />
+    <Compile Include="Engine\Map.cs" />
+    <Compile Include="Engine\MapManager.cs" />
+    <Compile Include="Engine\MouseEventArgs.cs" />
+    <Compile Include="Game\PlayerGameObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Game1.cs" />
-    <Compile Include="ResourceManager.cs" />
-    <Compile Include="Tile.cs" />
+    <Compile Include="Game\Program.cs" />
+    <Compile Include="Game\Game1.cs" />
+    <Compile Include="Engine\ResourceManager.cs" />
+    <Compile Include="Game\Tile.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Game.ico" />
+    <Content Include="Game\Game.ico" />
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </Content>
