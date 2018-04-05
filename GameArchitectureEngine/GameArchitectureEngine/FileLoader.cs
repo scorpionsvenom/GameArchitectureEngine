@@ -94,8 +94,6 @@ namespace GameArchitectureEngine
 
             try
             {
-                //can we not create a streamreader directly from the path?
-                //using (StreamReader fileStream = new StreamReader(TitleContainer.OpenStream(path)))
                 using (StreamReader fileStream = new StreamReader(path))
                 {
                     string line;

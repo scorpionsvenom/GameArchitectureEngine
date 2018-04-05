@@ -29,7 +29,7 @@ namespace GameArchitectureEngine
         public Dictionary<string, SpriteFont> Fonts;
         public Dictionary<string, SoundEffect> SFX;
         public Dictionary<string, Song> Songs;
-        //public Dictionary<string, Map> Maps;        
+        public Dictionary<string, Map> Maps;        
 
         #endregion
 
@@ -179,7 +179,7 @@ namespace GameArchitectureEngine
             Songs = new Dictionary<string, Song>();
             Fonts = new Dictionary<string, SpriteFont>();
             Overlays = new Dictionary<string, Texture2D>();
-
+            Maps = new Dictionary<string, Map>();
             //Get current working directory
             string directory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
@@ -268,11 +268,12 @@ namespace GameArchitectureEngine
 
                     Map map = fileLoader.ReadMap(path/*.Substring(path.IndexOf("Content"))*/);
 
-                    for (int i = 0; i < map.MapList.Count; i++)
-                    {
-                        foreach (string s in map.MapList[i])
-                            Console.WriteLine("line {0}: " + s + ",", i);
-                    }
+                    Maps.Add(cleanedPath, map);
+                    //for (int i = 0; i < map.MapList.Count; i++)
+                    //{
+                    //    foreach (string s in map.MapList[i])
+                    //        Console.WriteLine("line {0}: " + s + ",", i);
+                    //}
                     //Console.WriteLine("maps found: " + cleanedPath);
                 }
                 else if (path.Contains(overlays))

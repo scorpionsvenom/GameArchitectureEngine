@@ -10,6 +10,17 @@ namespace GameArchitectureEngine
         Impassable = 1,
         Platform = 2,
     }
+    
+    enum MapTileType
+    {
+        Earth = 0,
+        Grass = 1,
+        Water = 2,
+        Mountain = 3,
+        PlayerStart = 4,
+        EnemyStart = 5,
+        Exit = 6,
+    }
 
     class Tile
     {

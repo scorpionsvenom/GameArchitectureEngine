@@ -43,12 +43,57 @@ namespace GameArchitectureEngine
         ///<summary>
         /// Build the map
         /// </summary>
-        //public MapManager(ResourceManager resources)
-        //{
-        //    this.resources = resources;
+        public MapManager(ResourceManager resources)
+        {
+            this.resources = resources;            
+        }
 
-        //    fileLoader = new FileLoader()
-        //}
 
+        public void Draw(Map map, SpriteBatch spriteBatch)
+        {
+            List<string[]> mapList = map.MapList;
+
+            for (int i = 0; i < mapList.Count; i++)
+            {
+                for (int j = 0; j < mapList[i].Length; j++)
+                {
+                    int x, y, width, height;
+                    width = height = 64;
+                    x = y = 0;
+
+                    string value = mapList[i][j];
+                    string earth = "" + MapTileType.Earth;
+
+                    Vector2 origin = Vector2.Zero;
+
+                    switch (int.Parse(value))
+                    {
+                        case (int)MapTileType.Earth:
+                            x = y = 0;
+                            break;
+                        case (int)MapTileType.Grass:
+                            x = 64; y = 0;
+                            break;
+                        case (int)MapTileType.Water:
+                            x = 0; y = 64;
+                            break;
+                        case (int)MapTileType.Mountain:
+                            x = y = 64;
+                            break;
+                        default:
+                            x = y = 0;
+                            break;
+                    }
+
+                    Rectangle source = new Rectangle(x, y, width, height);
+                    Vector2 position = new Vector2(j * 64, i * 64);
+
+                    //TODO this resource should be passed in by caller, not stored internally. Not generic enough
+                    Texture2D texture = Resources.TileSheets[@"TileSheet/Terrains"];
+                    //TODO too many magic numbers...details should be passed in.
+                    spriteBatch.Draw(texture, position, source, Color.White, 0.0f, origin, 1.0f, SpriteEffects.None, .8f);
+                }
+            }
+        }
     }
 }

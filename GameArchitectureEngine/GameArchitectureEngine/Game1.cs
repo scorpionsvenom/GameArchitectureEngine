@@ -21,7 +21,7 @@ namespace GameArchitectureEngine
         
         ResourceManager Resources;
         CommandManager Commands;
-
+        MapManager mapManager;
         PlayerGameObject player;
 
         SpriteBatch spriteBatch;
@@ -43,14 +43,19 @@ namespace GameArchitectureEngine
             // TODO: Add your initialization logic here
             Resources = new ResourceManager();
             Commands = new CommandManager();
+            mapManager = new MapManager(Resources); //TODO don't think MapManager should need this
 
             player = new PlayerGameObject();
 
             this.IsMouseVisible = true;
 
+
+
             base.Initialize();
 
             InitialiseBindings();
+
+            
         }
 
         /// <summary>
@@ -63,6 +68,7 @@ namespace GameArchitectureEngine
             Resources.LoadContent(Content, GraphicsDevice);
             player.LoadContent(Resources);
 
+            
             //using (Stream fileStream = TitleContainer.OpenStream(@"Content/XML/info.xml"))
             //{
             //    FileLoader fileLoader = new FileLoader(fileStream);
@@ -109,11 +115,56 @@ namespace GameArchitectureEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Gray);
+            GraphicsDevice.Clear(Color.White);
 
             // TODO: Add your drawing code here
             //Resources.SprBatch.Begin();
             spriteBatch.Begin();
+
+
+            //List<string[]> mapList = Resources.Maps[@"Maps/0"].MapList;
+
+            mapManager.Draw(Resources.Maps[@"Maps/0"], spriteBatch);
+
+            //for (int i = 0; i < mapList.Count; i++)
+            //{
+            //    for (int j = 0; j < mapList[i].Length; j++)
+            //    {
+            //        int x, y, width, height;
+            //        width = height = 64;
+            //        x = y = 0;
+
+            //        string value = mapList[i][j];
+            //        string earth = "" + MapTileType.Earth;
+
+            //        Vector2 origin = Vector2.Zero;
+
+            //        switch(int.Parse(value))
+            //        {
+            //            case (int)MapTileType.Earth:
+            //                x = y = 0;
+            //                break;
+            //            case (int)MapTileType.Grass:
+            //                x = 64; y = 0;
+            //                break;
+            //            case (int)MapTileType.Water:
+            //                x = 0; y = 64;
+            //                break;
+            //            case (int)MapTileType.Mountain:
+            //                x = y = 64;
+            //                break;
+            //            default:
+            //                x = y = 0;
+            //                break;
+            //        }
+
+            //        Rectangle source = new Rectangle(x, y, width, height);
+            //        Vector2 position = new Vector2(j * 64, i * 64);
+
+            //        Texture2D texture = Resources.TileSheets[@"TileSheet/Terrains"];
+            //        spriteBatch.Draw(texture, position, source, Color.White, 0.0f, origin, 1.0f, SpriteEffects.None, .8f);
+            //    }
+            //}
 
             player.Draw(gameTime, spriteBatch);
 
