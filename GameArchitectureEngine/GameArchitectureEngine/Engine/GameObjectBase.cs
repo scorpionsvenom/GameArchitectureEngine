@@ -7,6 +7,7 @@ using Microsoft.Xna;
 
 namespace GameArchitectureEngine
 {
+    //TODO: make better use of this inheritance
     public class GameObjectBase
     {
         private Vector2 position;

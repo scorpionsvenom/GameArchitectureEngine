@@ -10,6 +10,8 @@ namespace GameArchitectureEngine
 {
     public class PlayerGameObject: GameObjectBase
     {
+        public Collidable Collidable;
+
         private ResourceManager Resources;
 
         private Vector2 velocity;
@@ -29,11 +31,7 @@ namespace GameArchitectureEngine
             set { velocity = value; }
         }
 
-        private float speed = 5.0f;
-
-        private const float MoveAcceleration = 12000.0f;
-        private const float MaxMoveSpeed = 1500.0f;
-        private const float DragFactor = 0.4f;
+        private float speed = 5.0f;        
 
         private Rectangle localBounds;
 
@@ -50,7 +48,10 @@ namespace GameArchitectureEngine
 
         public PlayerGameObject()
         {
+            //TODO: set position from serialised object
             Position = new Vector2(120f, 200f);
+            Collidable = new Collidable((int)Position.X, (int)Position.Y, sprite.Animation.FrameWidth, sprite.Animation.FrameHeight);
+            
             //Reset(Position);
         }
 
@@ -61,10 +62,10 @@ namespace GameArchitectureEngine
 
         public void LoadContent(ResourceManager resources)
         {
-            //Keep local copy of resource manager, don't think this is a good approach
+            //TODO: Keep local copy of resource manager, don't think this is a good approach
             Resources = resources;
 
-            //Too specific, i think this class shouldn't need to know so many specifics, they should be passed in
+            //TODO: Too specific, i think this class shouldn't need to know so many specifics, they should be passed in
             walkAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/WalkSpriteSheet"],0.1f, true);
             sprite.PlayAnimation(walkAnimation);
 
@@ -79,11 +80,12 @@ namespace GameArchitectureEngine
 
         public override void Reset(Vector2 position)
         {
-
+            //TODO: fill in
         }
 
         public override void Update(GameTime gameTime)
         {
+            //TODO: use idle animation if velocity is 0, or dead animation if dead
             if (isAlive)
                 sprite.PlayAnimation(walkAnimation);
             //else
@@ -131,7 +133,7 @@ namespace GameArchitectureEngine
             }
         }
 
-        //should be utility function
+        //TODO: should be utility function
         ///<summary https://stackoverflow.com/questions/7173256/check-if-mouse-is-inside-the-game-window>
         ///check if mouse coords are inside the window
         /// </summary>

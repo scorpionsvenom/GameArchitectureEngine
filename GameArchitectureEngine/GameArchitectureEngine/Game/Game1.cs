@@ -22,7 +22,12 @@ namespace GameArchitectureEngine
         ResourceManager Resources;
         CommandManager Commands;
         MapManager mapManager;
+
+        CollisionManager collisionManager;
+
+        //TODO: have a dictionary of gameobjectbases, so that appropriate methods can be called on each of these in an easier way
         PlayerGameObject player;
+        HealthPotionGameObject potion;
 
         SpriteBatch spriteBatch;
 
@@ -43,10 +48,11 @@ namespace GameArchitectureEngine
             // TODO: Add your initialization logic here
             Resources = new ResourceManager();
             Commands = new CommandManager();
-            mapManager = new MapManager(Resources); //TODO don't think MapManager should need Resources passed in
+            mapManager = new MapManager(Resources); //TODO: don't think MapManager should need Resources passed in
+            collisionManager = new CollisionManager();
 
             player = new PlayerGameObject();
-
+            potion = new HealthPotionGameObject(new Vector2(250, 200));//TODO: set this position from the map
             this.IsMouseVisible = true;
 
             base.Initialize();
@@ -63,6 +69,7 @@ namespace GameArchitectureEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Resources.LoadContent(Content, GraphicsDevice);
             player.LoadContent(Resources);
+            potion.LoadContent(Resources.SpriteSheets["Sprites/Powerups/Potion"]);
 
             mapManager.AddMapTileTypes("Earth", (int)enumMapTileType.Earth, 0, 0);
             mapManager.AddMapTileTypes("Grass", (int)enumMapTileType.Grass, 64, 0);
@@ -110,6 +117,7 @@ namespace GameArchitectureEngine
             {
                 mapManager.Draw(Resources.Maps[@"Maps/0"], spriteBatch);
 
+                potion.Draw(gameTime, spriteBatch);
                 player.Draw(gameTime, spriteBatch);
 
                 DrawHUD();
