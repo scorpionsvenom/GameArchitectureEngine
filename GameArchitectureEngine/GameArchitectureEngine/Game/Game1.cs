@@ -27,6 +27,7 @@ namespace GameArchitectureEngine
 
         //TODO: have a dictionary of gameobjectbases, so that appropriate methods can be called on each of these in an easier way
         List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
+        List<EnemyGameObject> enemies = new List<EnemyGameObject>();
 
         PlayerGameObject player;
         //HealthPotionGameObject potion;
@@ -59,6 +60,7 @@ namespace GameArchitectureEngine
 
             //TODO: this should be added to the list from the map
             potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
+            enemies.Add(new EnemyGameObject(new Vector2(350, 350), player));
 
             InitialiseCollidableObjects();
 
@@ -81,6 +83,9 @@ namespace GameArchitectureEngine
             
             foreach(HealthPotionGameObject potion in potions)
                 potion.LoadContent(Resources.SpriteSheets["Sprites/Powerups/Potion"]);
+
+            foreach (EnemyGameObject enemy in enemies)
+                enemy.LoadContent(Resources.SpriteSheets["Sprites/Enemies/EnemyIdle"]);
 
             mapManager.AddMapTileTypes("Earth", (int)enumMapTileType.Earth, 0, 0);
             mapManager.AddMapTileTypes("Grass", (int)enumMapTileType.Grass, 64, 0);
@@ -113,6 +118,10 @@ namespace GameArchitectureEngine
             ResolveRemovals();
             collisionManager.Update();
             Commands.Update();
+
+            foreach (EnemyGameObject enemy in enemies)
+                enemy.Update(gameTime);
+
             player.Update(gameTime);
 
             base.Update(gameTime);
@@ -132,6 +141,9 @@ namespace GameArchitectureEngine
 
                 foreach(HealthPotionGameObject potion in potions)
                     potion.Draw(gameTime, spriteBatch);
+
+                foreach (EnemyGameObject enemy in enemies)
+                    enemy.Draw(gameTime, spriteBatch);
 
                 player.Draw(gameTime, spriteBatch);
 
