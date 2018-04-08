@@ -8,8 +8,20 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameArchitectureEngine
 {
-    public class PlayerGameObject: GameObjectBase
+    public class PlayerGameObject : GameObjectBase
     {
+        private int health;
+        public int Health
+        {
+            get { return health; }
+        }
+
+        private int maxHealth;
+        public int MaxHealth
+        {
+            get { return maxHealth; }
+        }
+
         public Collidable Collidable;
 
         private ResourceManager Resources;
@@ -50,14 +62,15 @@ namespace GameArchitectureEngine
         {
             //TODO: set position from serialised object
             Position = new Vector2(120f, 200f);
-            Collidable = new Collidable((int)Position.X, (int)Position.Y, sprite.Animation.FrameWidth, sprite.Animation.FrameHeight);
+            
             
             //Reset(Position);
         }
 
         public override void Initialise()
         {
-            
+            health = 50;
+            maxHealth = 100;
         }
 
         public void LoadContent(ResourceManager resources)
@@ -75,6 +88,8 @@ namespace GameArchitectureEngine
             int top = walkAnimation.FrameHeight - height;
             localBounds = new Rectangle(left, top, width, height);
 
+            //Collidable = new Collidable();
+            BoundingBox = BoundingRectangle;
             //sounds
         }
 
@@ -94,6 +109,8 @@ namespace GameArchitectureEngine
                 velocity = Vector2.Zero;
             else
                 Position += velocity;
+
+            BoundingBox = BoundingRectangle;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -131,6 +148,26 @@ namespace GameArchitectureEngine
                     Velocity = direction;
                 }
             }
+        }
+
+        public override bool CollisionTest(Collidable col)
+        {
+            if (col != null)
+            {
+                return BoundingBox.Intersects(col.BoundingBox);
+            }
+
+            return false;
+        }
+
+        public override void OnCollision(Collidable col)
+        {
+            
+        }
+
+        public void HealPlayer(int amount)
+        {
+            health = Math.Min(health + amount, maxHealth);
         }
 
         //TODO: should be utility function

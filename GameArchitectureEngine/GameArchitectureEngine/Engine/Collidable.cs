@@ -7,28 +7,30 @@ using Microsoft.Xna.Framework;
 namespace GameArchitectureEngine
 {
     public class Collidable
-    {        
+    {
+        public bool flagForRemoval;
+
         private Rectangle boundingBox;
         public Rectangle BoundingBox
         {
             get { return boundingBox; }
-        }
+            set { boundingBox = value; }
+        }        
 
-        public Collidable(int x, int y, int width, int height)
+        public virtual bool CollisionTest(Collidable col)
         {
-            boundingBox = new Rectangle(x, y, width, height);
-        }
-
-        public bool CollisionTest(Collidable col)
-        {
-            if (col != null)
-            {
-                return BoundingBox.Intersects(col.BoundingBox);
-            }
-
             return false;
         }
-        public void OnCollision(Collidable col)
+        //public bool CollisionTest(Collidable col)
+        //{
+        //    if (col != null)
+        //    {
+        //        return BoundingBox.Intersects(col.BoundingBox);
+        //    }
+
+        //    return false;
+        //}
+        public virtual void OnCollision(Collidable col)
         {
 
         }

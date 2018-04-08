@@ -46,5 +46,19 @@ namespace GameArchitectureEngine
             foreach (Collision col in collisions)
                 col.Resolve();
         }
+
+        public void RemoveCollidable(List<Collidable> toRemove)
+        {
+            for (int i = 0; i < toRemove.Count; i++)
+            {
+                for (int j = 0; j < collidables.Count; j++)
+                {
+                    if (toRemove[i].Equals(collidables[j]))
+                    {
+                        collidables.RemoveAt(j);
+                    }
+                }
+            }
+        }
     }
 }

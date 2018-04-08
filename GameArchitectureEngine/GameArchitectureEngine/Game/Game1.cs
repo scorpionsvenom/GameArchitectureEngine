@@ -26,8 +26,10 @@ namespace GameArchitectureEngine
         CollisionManager collisionManager;
 
         //TODO: have a dictionary of gameobjectbases, so that appropriate methods can be called on each of these in an easier way
+        List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
+
         PlayerGameObject player;
-        HealthPotionGameObject potion;
+        //HealthPotionGameObject potion;
 
         SpriteBatch spriteBatch;
 
@@ -52,7 +54,14 @@ namespace GameArchitectureEngine
             collisionManager = new CollisionManager();
 
             player = new PlayerGameObject();
-            potion = new HealthPotionGameObject(new Vector2(250, 200));//TODO: set this position from the map
+            player.Initialise();
+            
+
+            //TODO: this should be added to the list from the map
+            potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
+
+            InitialiseCollidableObjects();
+
             this.IsMouseVisible = true;
 
             base.Initialize();
@@ -69,7 +78,9 @@ namespace GameArchitectureEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Resources.LoadContent(Content, GraphicsDevice);
             player.LoadContent(Resources);
-            potion.LoadContent(Resources.SpriteSheets["Sprites/Powerups/Potion"]);
+            
+            foreach(HealthPotionGameObject potion in potions)
+                potion.LoadContent(Resources.SpriteSheets["Sprites/Powerups/Potion"]);
 
             mapManager.AddMapTileTypes("Earth", (int)enumMapTileType.Earth, 0, 0);
             mapManager.AddMapTileTypes("Grass", (int)enumMapTileType.Grass, 64, 0);
@@ -99,6 +110,8 @@ namespace GameArchitectureEngine
             //    this.Exit();
 
             // TODO: Add your update logic here
+            ResolveRemovals();
+            collisionManager.Update();
             Commands.Update();
             player.Update(gameTime);
 
@@ -117,7 +130,9 @@ namespace GameArchitectureEngine
             {
                 mapManager.Draw(Resources.Maps[@"Maps/0"], spriteBatch);
 
-                potion.Draw(gameTime, spriteBatch);
+                foreach(HealthPotionGameObject potion in potions)
+                    potion.Draw(gameTime, spriteBatch);
+
                 player.Draw(gameTime, spriteBatch);
 
                 DrawHUD();
@@ -134,7 +149,7 @@ namespace GameArchitectureEngine
             Vector2 centre = new Vector2(TitleSafeArea.X + TitleSafeArea.Width / 2.0f,
                                          TitleSafeArea.Y + TitleSafeArea.Height / 2.0f);
 
-            string message = "Some stuffs";
+            string message = "Health: " + player.Health + "/" + player.MaxHealth;
             Color messageColour;
 
             messageColour = Color.Gray;
@@ -155,7 +170,6 @@ namespace GameArchitectureEngine
         private void InitialiseBindings()
         {
             Commands.AddKeyboardBindings(Keys.Escape, StopGame);
-            Commands.AddKeyboardBindings(Keys.Up, MoveUp);
             Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
         }
 
@@ -167,12 +181,35 @@ namespace GameArchitectureEngine
             }
         }
 
-        public void MoveUp(eButtonState buttonState, Vector2 amount)
+        public void InitialiseCollidableObjects()
         {
-            if (buttonState == eButtonState.DOWN)
-            {
+            collisionManager.AddCollidable(player);
+            foreach (HealthPotionGameObject potion in potions)
+                collisionManager.AddCollidable(potion);
+        }
 
+        public void ResolveRemovals()
+        {
+            List<Collidable> toRemove = new List<Collidable>();
+
+            foreach (HealthPotionGameObject potion in potions)
+            {
+                if (potion.flagForRemoval)
+                    toRemove.Add(potion);
             }
+
+            for (int i = 0; i < toRemove.Count; i++)
+            {
+                for (int j = 0; j < potions.Count; j++)
+                {
+                    if (toRemove[i].Equals(potions[j]))
+                    {
+                        potions.RemoveAt(i);                        
+                    }
+                }
+            }
+
+            collisionManager.RemoveCollidable(toRemove);
         }
     }
 }

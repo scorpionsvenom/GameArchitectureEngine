@@ -8,7 +8,7 @@ using Microsoft.Xna;
 namespace GameArchitectureEngine
 {
     //TODO: make better use of this inheritance
-    public class GameObjectBase
+    public class GameObjectBase : Collidable
     {
         private Vector2 position;
         private float rotation;
@@ -25,7 +25,7 @@ namespace GameArchitectureEngine
             get { return rotation; }
             set { rotation = value; }
         }
-        
+
         public string Type
         {
             get { return type; }
