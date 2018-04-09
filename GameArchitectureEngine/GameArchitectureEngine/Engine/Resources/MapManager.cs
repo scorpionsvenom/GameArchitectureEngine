@@ -54,7 +54,7 @@ namespace GameArchitectureEngine
                     x = y = 0;
 
                     string value = mapList[i][j];
-                    string earth = "" + enumMapTileType.Earth;
+                    //string earth = "" + enumMapTileType.Earth;
 
                     Vector2 origin = Vector2.Zero;
                     

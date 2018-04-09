@@ -80,17 +80,41 @@ namespace GameArchitectureEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Resources.LoadContent(Content, GraphicsDevice);
             player.LoadContent(Resources);
-            
-            foreach(HealthPotionGameObject potion in potions)
+
+            foreach (HealthPotionGameObject potion in potions)
                 potion.LoadContent(Resources.SpriteSheets["Sprites/Powerups/Potion"]);
 
             foreach (EnemyGameObject enemy in enemies)
                 enemy.LoadContent(Resources.SpriteSheets["Sprites/Enemies/EnemyIdle"]);
 
-            mapManager.AddMapTileTypes("Earth", (int)enumMapTileType.Earth, 0, 0);
-            mapManager.AddMapTileTypes("Grass", (int)enumMapTileType.Grass, 64, 0);
-            mapManager.AddMapTileTypes("Water", (int)enumMapTileType.Water, 0, 64);
-            mapManager.AddMapTileTypes("Mountain", (int)enumMapTileType.Mountain, 64, 64);
+            //mapManager.AddMapTileTypes("Earth", (int)enumMapTileType.Earth, 0, 0);
+            //mapManager.AddMapTileTypes("Grass", (int)enumMapTileType.Grass, 64, 0);
+            //mapManager.AddMapTileTypes("Water", (int)enumMapTileType.Water, 0, 64);
+            //mapManager.AddMapTileTypes("Mountain", (int)enumMapTileType.Mountain, 64, 64);
+            mapManager.AddMapTileTypes("GrassTL", (int)enumMapTileType.GrassTL, 0, 0);
+            mapManager.AddMapTileTypes("GrassT", (int)enumMapTileType.GrassT, 64, 0);
+            mapManager.AddMapTileTypes("GrassTR", (int)enumMapTileType.GrassTR, 128, 0);
+
+            mapManager.AddMapTileTypes("EarthTL", (int)enumMapTileType.EarthTL, 192, 0);
+            mapManager.AddMapTileTypes("EarthT", (int)enumMapTileType.EarthT, 256, 0);
+            mapManager.AddMapTileTypes("EarthTR", (int)enumMapTileType.EarthTR, 320, 0);
+
+            mapManager.AddMapTileTypes("GrassL", (int)enumMapTileType.GrassL, 0, 64);
+            mapManager.AddMapTileTypes("GrassM", (int)enumMapTileType.GrassM, 64, 64);
+            mapManager.AddMapTileTypes("GrassR", (int)enumMapTileType.GrassR, 128, 64);
+
+            mapManager.AddMapTileTypes("EarthL", (int)enumMapTileType.EarthL, 192, 64);
+            mapManager.AddMapTileTypes("EarthM", (int)enumMapTileType.EarthM, 256, 64);
+            mapManager.AddMapTileTypes("EarthR", (int)enumMapTileType.EarthR, 320, 64);
+
+            mapManager.AddMapTileTypes("GrassBL", (int)enumMapTileType.GrassBL, 0, 128);
+            mapManager.AddMapTileTypes("GrassB", (int)enumMapTileType.GrassB, 64, 128);
+            mapManager.AddMapTileTypes("GrassBR", (int)enumMapTileType.GrassBR, 128, 128);
+
+            mapManager.AddMapTileTypes("EarthBL", (int)enumMapTileType.EarthBL, 0, 128);
+            mapManager.AddMapTileTypes("EarthB", (int)enumMapTileType.EarthB, 64, 128);
+            mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 128, 128);
+
         }
 
         /// <summary>

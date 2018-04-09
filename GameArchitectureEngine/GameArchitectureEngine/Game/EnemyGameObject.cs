@@ -29,6 +29,8 @@ namespace GameArchitectureEngine
         }
 
         private float speed = 2.0f;
+        private int range = 200;
+        private int multiplier = 4;
 
         public Collidable Collidable;
 
@@ -71,18 +73,18 @@ namespace GameArchitectureEngine
             //Collidable = new Collidable();
             BoundingBox = new Rectangle(BoundingRectangle.X, BoundingRectangle.Y, BoundingRectangle.Width, BoundingRectangle.Height);
 
-            sightRange = new Rectangle((int)Position.X - 100, (int)Position.Y - 100, 200, 200);
+            sightRange = new Rectangle((int)Position.X - range, (int)Position.Y - range, range * 2, range * 2);
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
-            sightRange = new Rectangle((int)Position.X - 100, (int)Position.Y - 100, 200, 200);
+            sightRange = new Rectangle((int)Position.X - range, (int)Position.Y - range, range* 2, range * 2);
             MoveToward(player, gameTime);            
         }
 
         public void Draw(GameTime gameTime, SpriteBatch sprBatch)
         {
-            sprite.Draw(gameTime, sprBatch, Position, SpriteEffects.None);
+            sprite.Draw(gameTime, sprBatch, Position, SpriteEffects.None);            
         }
 
         public void MoveToward(GameObjectBase obj, GameTime gameTime)

@@ -13,13 +13,31 @@ namespace GameArchitectureEngine
 
     enum enumMapTileType
     {
-        Earth = 0,
-        Grass = 1,
-        Water = 2,
-        Mountain = 3,
-        PlayerStart = 4,
-        EnemyStart = 5,
-        Exit = 6,
+        //Earth = 0,
+        //Grass = 1,
+        //Water = 2,
+        //Mountain = 3,
+        //PlayerStart = 4,
+        //EnemyStart = 5,
+        //Exit = 6,
+        GrassTL = 0,
+        GrassT = 1,
+        GrassTR = 2,
+        EarthTL = 3,
+        EarthT = 4,
+        EarthTR = 5,
+        GrassL = 6,
+        GrassM = 7,
+        GrassR = 8,
+        EarthL = 9,
+        EarthM = 10,
+        EarthR = 11,
+        GrassBL = 12,
+        GrassB = 13,
+        GrassBR = 14,
+        EarthBL = 15,
+        EarthB = 16,
+        EarthBR = 17,
     }
 
     class Tile
