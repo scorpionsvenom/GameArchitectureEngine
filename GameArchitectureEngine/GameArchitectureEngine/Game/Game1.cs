@@ -111,9 +111,9 @@ namespace GameArchitectureEngine
             mapManager.AddMapTileTypes("GrassB", (int)enumMapTileType.GrassB, 64, 128);
             mapManager.AddMapTileTypes("GrassBR", (int)enumMapTileType.GrassBR, 128, 128);
 
-            mapManager.AddMapTileTypes("EarthBL", (int)enumMapTileType.EarthBL, 0, 128);
-            mapManager.AddMapTileTypes("EarthB", (int)enumMapTileType.EarthB, 64, 128);
-            mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 128, 128);
+            mapManager.AddMapTileTypes("EarthBL", (int)enumMapTileType.EarthBL, 192, 128);
+            mapManager.AddMapTileTypes("EarthB", (int)enumMapTileType.EarthB, 256, 128);
+            mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 320, 128);
 
         }
 
