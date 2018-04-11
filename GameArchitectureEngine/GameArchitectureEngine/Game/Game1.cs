@@ -56,7 +56,6 @@ namespace GameArchitectureEngine
 
             player = new PlayerGameObject();
             player.Initialise();
-            
 
             //TODO: this should be added to the list from the map
             potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
@@ -147,6 +146,8 @@ namespace GameArchitectureEngine
                 enemy.Update(gameTime);
 
             player.Update(gameTime);
+            
+
 
             base.Update(gameTime);
         }
@@ -158,10 +159,13 @@ namespace GameArchitectureEngine
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.White);
-            
+
+            //graphics.GraphicsDevice.Viewport.X = player.Position.X - graphics.GraphicsDevice.Viewport.TitleSafeArea.X / 2;
+            //graphics.GraphicsDevice.Viewport.Y = player.Position.Y - graphics.GraphicsDevice.Viewport.TitleSafeArea.Y / 2;
+
             spriteBatch.Begin();
             {
-                mapManager.Draw(Resources.Maps[@"Maps/0"], spriteBatch);
+                mapManager.Draw(Resources.Maps["Maps/0"], spriteBatch);
 
                 foreach(HealthPotionGameObject potion in potions)
                     potion.Draw(gameTime, spriteBatch);
@@ -222,6 +226,9 @@ namespace GameArchitectureEngine
             collisionManager.AddCollidable(player);
             foreach (HealthPotionGameObject potion in potions)
                 collisionManager.AddCollidable(potion);
+
+            foreach (EnemyGameObject enemy in enemies)
+                collisionManager.AddCollidable(enemy);
         }
 
         public void ResolveRemovals()

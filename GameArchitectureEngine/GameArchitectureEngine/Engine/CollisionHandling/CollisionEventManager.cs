@@ -5,27 +5,38 @@ using System.Text;
 
 namespace GameArchitectureEngine
 {
-    public delegate void CollisionAction(GameObjectBase col);
+    public delegate void CollisionEventHandler(object sender, EventArgs e);
 
-    public class CollisionManager
+    public class CollisionEventManager
     {
-        private CollisionListener collisionListener;
+        public event CollisionEventHandler OnCollisionEnterEvent;
+        public event CollisionEventHandler OnCollisionExitEvent;
 
         private List<Collidable> collidables = new List<Collidable>();
         private HashSet<Collision> collisions = new HashSet<Collision>(new CollisionComparer());
 
-        public CollisionManager()
+        public void OnCollisionEnter(EventArgs e)
         {
-            collisionListener = new CollisionListener();
+            OnCollisionEnterEvent?.Invoke(this, e);
+        }
+
+        public void OnCollisionExit(EventArgs e)
+        {
+            OnCollisionExitEvent?.Invoke(this, e);
+        }
+
+        public void init()
+        {
+            foreach (Collision col in collisions)
+            {
+                //OnCollisionEnterEvent += col.Resolve;
+                //OnCollisionExitEvent += col.ResolveExit;
+            }
         }
 
         public void AddCollidable(Collidable col)
         {
-            collidables.Add(col);
-
-            //foreach(Collidable collidable in collidables)
-            //    collisionListener.OnCollision += ;
-            //    collisionListener.OnCollision +=
+            collidables.Add(col);            
         }
 
         public void Update()

@@ -19,17 +19,37 @@ namespace GameArchitectureEngine
         public override void Enter(object owner)
         {
             //Define enemy and behaviour initialisation
-            throw new NotImplementedException();
+            EnemyGameObject enemy = owner as EnemyGameObject;
+
+            if (enemy != null) enemy.Speed = 48;
+
+            currentTime = 0.0;
         }
 
         public override void Exit(object owner)
         {
-            throw new NotImplementedException();
+            EnemyGameObject enemy = owner as EnemyGameObject;
+
+            if (enemy != null) enemy.Speed = 64;
+
+            currentTime = 0.0f;
         }
 
         public override void Execute(object owner, GameTime gameTime)
         {
-            throw new NotImplementedException();
+            EnemyGameObject enemy = owner as EnemyGameObject;
+
+            if (enemy == null) return;
+
+            if (currentTime >= directionChangeTime)
+            {
+                currentTime = 0.0f;
+                enemy.SetRandomDirection();
+            }
+            else
+            {
+                currentTime += gameTime.ElapsedGameTime.TotalSeconds;
+            }
         }
     }
 }

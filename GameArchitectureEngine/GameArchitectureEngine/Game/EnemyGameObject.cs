@@ -9,6 +9,10 @@ namespace GameArchitectureEngine
 {
     public class EnemyGameObject : GameObjectBase
     {
+        public FSM fsm;
+        public IdleState idle;
+        GameTime gameTime;
+
         Animation idleAnimation;
         Animation walkingAnimation;
         Animation attackAnimation;
@@ -28,13 +32,45 @@ namespace GameArchitectureEngine
             get { return maxHealth; }
         }
 
-        private float speed = 2.0f;
-        private int range = 200;
-        private int multiplier = 4;
+        private Vector2 velocity;
+        public Vector2 Velocity
+        {
+            get { return velocity; }
+            set { velocity = value; }
+        }
+        private SpriteEffects flip = SpriteEffects.None;
+
+        bool isAlive = true;
+
+        private float speed = 64.0f;
+        public float Speed
+        {
+            get { return speed; }
+            set { speed = value; }
+        }
+
+        private Vector2 direction;
+        //public Vector2 Direction
+        //{
+        //    get { return direction; }
+        //    set { direction = value; }
+        //}
+
+        private int sightRange = 200;
+        public int SightRange
+        {
+            get { return sightRange; }
+        }
+
+        private int attackRange = 32;
+        public int AttackRange
+        {
+            get { return attackRange; }            
+        }
 
         public Collidable Collidable;
 
-        private Rectangle sightRange;
+        private Rectangle sightRangeRectangle;
 
         private Rectangle localBounds;
 
@@ -48,9 +84,7 @@ namespace GameArchitectureEngine
                 return new Rectangle(left, top, localBounds.Width, localBounds.Height);
             }
         }
-
-        private FSM fsm;
-
+        
         private GameObjectBase player;
 
         public EnemyGameObject(Vector2 position, GameObjectBase player)
@@ -61,6 +95,10 @@ namespace GameArchitectureEngine
 
         public void LoadContent(Texture2D texture)
         {
+            fsm = new FSM(this);
+            idle = new IdleState();
+            fsm.AddState(idle);
+            fsm.Initialise("Idle");
             idleAnimation = new Animation(texture, 0.5f, true);
             sprite.PlayAnimation(idleAnimation);
 
@@ -73,32 +111,55 @@ namespace GameArchitectureEngine
             //Collidable = new Collidable();
             BoundingBox = new Rectangle(BoundingRectangle.X, BoundingRectangle.Y, BoundingRectangle.Width, BoundingRectangle.Height);
 
-            sightRange = new Rectangle((int)Position.X - range, (int)Position.Y - range, range * 2, range * 2);
+            sightRangeRectangle = new Rectangle((int)Position.X - SightRange, (int)Position.Y - SightRange, SightRange * 2, SightRange * 2);
         }
 
         public override void Update(GameTime gameTime)
         {
-            sightRange = new Rectangle((int)Position.X - range, (int)Position.Y - range, range* 2, range * 2);
-            MoveToward(player, gameTime);            
+            this.gameTime = gameTime;
+            fsm.Update(gameTime);
+            sightRangeRectangle = new Rectangle((int)Position.X - SightRange, (int)Position.Y - SightRange, SightRange * 2, SightRange * 2);
+            Position += Velocity;
+            //MoveToward(player, gameTime);            
         }
 
         public void Draw(GameTime gameTime, SpriteBatch sprBatch)
         {
-            sprite.Draw(gameTime, sprBatch, Position, SpriteEffects.None);            
+            if (Velocity.X > 0)
+                flip = SpriteEffects.FlipHorizontally;
+            if (Velocity.X < 0)
+                flip = SpriteEffects.None;
+
+            sprite.Draw(gameTime, sprBatch, Position, flip);
         }
 
         public void MoveToward(GameObjectBase obj, GameTime gameTime)
         {
-            if (obj.BoundingBox.Intersects(sightRange))
+            if (obj.BoundingBox.Intersects(sightRangeRectangle))
             {
-                float elapsedTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                Vector2 direction = obj.Position - Position;
+                Vector2 directionToChase = obj.Position - Position;
 
-                direction.Normalize();
-
-                Position += (direction * speed);
+                directionToChase.Normalize();
+                Velocity = directionToChase * speed * elapsedTime;
+                direction = directionToChase;
             }
-        }        
+        }
+
+
+        public void SetRandomDirection()
+        {
+            float randomXDirection = Utilities.RandomFloatInRange();
+            float randomYDirection = Utilities.RandomFloatInRange();
+
+            direction.X += randomXDirection * Speed;
+            direction.Y += randomYDirection * Speed;
+            direction.Normalize();
+
+            Velocity = direction * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        }
+
+        
     }
 }

@@ -47,5 +47,10 @@ namespace GameArchitectureEngine
         {
             this.A.OnCollision(this.B);
         }
+
+        public void ResolveExit()
+        {
+            this.A.OnCollisionExit(this.B);
+        }
     }
 }

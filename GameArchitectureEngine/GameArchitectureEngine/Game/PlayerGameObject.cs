@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace GameArchitectureEngine
 {
     public class PlayerGameObject : GameObjectBase
-    {
+    {        
         private int health;
         public int Health
         {
@@ -43,7 +43,8 @@ namespace GameArchitectureEngine
             set { velocity = value; }
         }
 
-        private float speed = 5.0f;        
+        GameTime gameTime;
+        private float speed = 160.0f;        
 
         private Rectangle localBounds;
 
@@ -79,7 +80,7 @@ namespace GameArchitectureEngine
             Resources = resources;
 
             //TODO: Too specific, i think this class shouldn't need to know so many specifics, they should be passed in
-            walkAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/WalkSpriteSheet"],0.1f, true);
+            walkAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/WalkSpriteSheet"],0.25f, true);
             sprite.PlayAnimation(walkAnimation);
 
             int width = (int)(walkAnimation.FrameWidth * 0.4f);
@@ -100,6 +101,7 @@ namespace GameArchitectureEngine
 
         public override void Update(GameTime gameTime)
         {
+            this.gameTime = gameTime;
             //TODO: use idle animation if velocity is 0, or dead animation if dead
             if (isAlive)
                 sprite.PlayAnimation(walkAnimation);
@@ -122,19 +124,15 @@ namespace GameArchitectureEngine
 
             sprite.Draw(gameTime, spriteBatch, Position, flip);
         }
-
-        public void Move(Vector2 velocityChange)
-        {
-            velocity = velocityChange;
-        }
         
         public void MoveTowards(eButtonState buttonState, Vector2 mouseLocation)
         {
             if (buttonState == eButtonState.DOWN)
             {
+                float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 Rectangle safeArea = Resources.GraphicsDevice.Viewport.TitleSafeArea;
                 
-                if (IsVectorInsideWindow(mouseLocation, Resources.GraphicsDevice))
+                if (Utilities.IsVectorInsideWindow(mouseLocation, Resources.GraphicsDevice))
                 {
                     lastMouseLocation = mouseLocation;
 
@@ -143,7 +141,7 @@ namespace GameArchitectureEngine
                     direction.Normalize();
 
                     float distance = Vector2.Distance(Position, mouseLocation);
-                    direction *= Math.Min(speed, distance);
+                    direction = direction * speed * elapsedTime;
 
                     Velocity = direction;
                 }
@@ -154,6 +152,7 @@ namespace GameArchitectureEngine
         {
             if (col != null)
             {
+                OnCollision(col);
                 return BoundingBox.Intersects(col.BoundingBox);
             }
 
@@ -174,11 +173,6 @@ namespace GameArchitectureEngine
         ///<summary https://stackoverflow.com/questions/7173256/check-if-mouse-is-inside-the-game-window>
         ///check if mouse coords are inside the window
         /// </summary>
-        bool IsVectorInsideWindow(Vector2 vectorToCheck, GraphicsDevice graphicsDevice)
-        {
-            Point pos = new Point((int)vectorToCheck.X, (int)vectorToCheck.Y);
-
-            return graphicsDevice.Viewport.Bounds.Contains(pos);
-        }
+        
     }
 }
