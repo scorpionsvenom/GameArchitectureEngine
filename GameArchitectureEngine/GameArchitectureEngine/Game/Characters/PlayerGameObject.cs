@@ -71,7 +71,7 @@ namespace GameArchitectureEngine
         public override void Initialise()
         {
             health = 50;
-            maxHealth = 100;
+            maxHealth = 200;
         }
 
         public void LoadContent(ResourceManager resources)
@@ -169,10 +169,9 @@ namespace GameArchitectureEngine
             health = Math.Min(health + amount, maxHealth);
         }
 
-        //TODO: should be utility function
-        ///<summary https://stackoverflow.com/questions/7173256/check-if-mouse-is-inside-the-game-window>
-        ///check if mouse coords are inside the window
-        /// </summary>
-        
+        public void HurtPlayer(int amount)
+        {
+            health = Math.Max(0, health - amount);
+        }
     }
 }

@@ -16,8 +16,8 @@
     <XnaProfile>Reach</XnaProfile>
     <XnaCrossPlatformGroupID>0638046a-bb3e-44b9-93a1-e15c699e658a</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
-    <ApplicationIcon>Game\Game.ico</ApplicationIcon>
-    <Thumbnail>GameThumbnail.png</Thumbnail>
+    <ApplicationIcon>Game\MainGameStuff\Game.ico</ApplicationIcon>
+    <Thumbnail>Game\MainGameStuff\GameThumbnail.png</Thumbnail>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -86,26 +86,33 @@
     <Compile Include="Engine\Resources\FileLoader.cs" />
     <Compile Include="Engine\FiniteStateMachine\State.cs" />
     <Compile Include="Engine\Utilities.cs" />
-    <Compile Include="Game\EnemyGameObject.cs" />
-    <Compile Include="Game\GameInfo.cs" />
+    <Compile Include="Game\Characters\MousePointer.cs" />
+    <Compile Include="Game\States\AI States\AttackState.cs" />
+    <Compile Include="Game\States\AI States\ChaseState.cs" />
+    <Compile Include="Game\Characters\EnemyGameObject.cs" />
+    <Compile Include="Game\States\AI States\FleeState.cs" />
+    <Compile Include="Game\MainGameStuff\GameInfo.cs" />
     <Compile Include="Engine\GameObjectBase.cs" />
     <Compile Include="Engine\Input\InputListener.cs" />
     <Compile Include="Engine\Input\KeyboardEventArgs.cs" />
     <Compile Include="Engine\Resources\Map.cs" />
     <Compile Include="Engine\Resources\MapManager.cs" />
     <Compile Include="Engine\Input\MouseEventArgs.cs" />
-    <Compile Include="Game\HealthPotionGameObject.cs" />
-    <Compile Include="Game\IdleState.cs" />
-    <Compile Include="Game\PlayerGameObject.cs" />
+    <Compile Include="Game\Items\HealthPotionGameObject.cs" />
+    <Compile Include="Game\States\AI States\IdleState.cs" />
+    <Compile Include="Game\Characters\PlayerGameObject.cs" />
+    <Compile Include="Game\States\GameStates\GameOverState.cs" />
+    <Compile Include="Game\States\GameStates\IntroScreenState.cs" />
+    <Compile Include="Game\States\GameStates\MainGameState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Game\Program.cs" />
-    <Compile Include="Game\Game1.cs" />
+    <Compile Include="Game\MainGameStuff\Program.cs" />
+    <Compile Include="Game\MainGameStuff\Game1.cs" />
     <Compile Include="Engine\Resources\ResourceManager.cs" />
-    <Compile Include="Game\Tile.cs" />
+    <Compile Include="Game\Tile\Tile.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Game\Game.ico" />
-    <Content Include="GameThumbnail.png">
+    <Content Include="Game\MainGameStuff\Game.ico" />
+    <Content Include="Game\MainGameStuff\GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </Content>
   </ItemGroup>

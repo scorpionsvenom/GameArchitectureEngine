@@ -29,7 +29,13 @@ namespace GameArchitectureEngine
         List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
         List<EnemyGameObject> enemies = new List<EnemyGameObject>();
 
-        PlayerGameObject player;
+        private PlayerGameObject player;
+        public PlayerGameObject Player
+        {
+            get { return player; }
+        }
+
+        public MousePointer mousePointer;
         //HealthPotionGameObject potion;
 
         SpriteBatch spriteBatch;
@@ -47,7 +53,7 @@ namespace GameArchitectureEngine
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize()
-        {
+        {            
             // TODO: Add your initialization logic here
             Resources = new ResourceManager();
             Commands = new CommandManager();
@@ -56,14 +62,20 @@ namespace GameArchitectureEngine
 
             player = new PlayerGameObject();
             player.Initialise();
+            mousePointer = new MousePointer();
 
             //TODO: this should be added to the list from the map
             potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
-            enemies.Add(new EnemyGameObject(new Vector2(350, 350), player));
+            enemies.Add(new EnemyGameObject(new Vector2(350, 350), player, 15, 100));
+            enemies.Add(new EnemyGameObject(new Vector2(500, 400), player, 100, 100));
+
+            //TEstings
+            foreach (EnemyGameObject enemy in enemies)
+                enemy.DamagePlayer += HurtPlayerTest;
 
             InitialiseCollidableObjects();
 
-            this.IsMouseVisible = true;
+            //this.IsMouseVisible = true;
 
             base.Initialize();
 
@@ -79,12 +91,13 @@ namespace GameArchitectureEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Resources.LoadContent(Content, GraphicsDevice);
             player.LoadContent(Resources);
+            mousePointer.LoadContent(Resources);
 
             foreach (HealthPotionGameObject potion in potions)
                 potion.LoadContent(Resources.SpriteSheets["Sprites/Powerups/Potion"]);
 
             foreach (EnemyGameObject enemy in enemies)
-                enemy.LoadContent(Resources.SpriteSheets["Sprites/Enemies/EnemyIdle"]);
+                enemy.LoadContent(Resources);// Resources.SpriteSheets["Sprites/Enemies/EnemyIdle"]);
 
             //mapManager.AddMapTileTypes("Earth", (int)enumMapTileType.Earth, 0, 0);
             //mapManager.AddMapTileTypes("Grass", (int)enumMapTileType.Grass, 64, 0);
@@ -146,7 +159,7 @@ namespace GameArchitectureEngine
                 enemy.Update(gameTime);
 
             player.Update(gameTime);
-            
+            mousePointer.Update();
 
 
             base.Update(gameTime);
@@ -174,7 +187,7 @@ namespace GameArchitectureEngine
                     enemy.Draw(gameTime, spriteBatch);
 
                 player.Draw(gameTime, spriteBatch);
-
+                mousePointer.Draw(spriteBatch);
                 DrawHUD();
             }        
             spriteBatch.End();
@@ -253,6 +266,11 @@ namespace GameArchitectureEngine
             }
 
             collisionManager.RemoveCollidable(toRemove);
+        }
+
+        public void HurtPlayerTest(object sender, EventArgs e)
+        {            
+            player.HurtPlayer(25);
         }
     }
 }

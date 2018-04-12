@@ -21,6 +21,9 @@ namespace GameArchitectureEngine
             return random.Next();
         }
         
+        ///<summary https://stackoverflow.com/questions/7173256/check-if-mouse-is-inside-the-game-window>
+        ///check if mouse coords are inside the window
+        /// </summary>
         public static bool IsVectorInsideWindow(Vector2 vectorToCheck, GraphicsDevice graphicsDevice)
         {
             Point pos = new Point((int)vectorToCheck.X, (int)vectorToCheck.Y);

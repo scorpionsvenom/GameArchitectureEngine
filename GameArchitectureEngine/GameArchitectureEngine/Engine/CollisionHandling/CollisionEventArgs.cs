@@ -1,16 +1,15 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace GameArchitectureEngine
 {
     public class CollisionEventArgs : EventArgs
     {
-        public readonly bool isColliding;
-        public bool wasCollidingLastFrame;
+        public readonly Vector2 PositionOfCollidingObject;
 
-        public CollisionEventArgs(bool isColliding, bool wasColliding)
+        public CollisionEventArgs(Vector2 position)
         {
-            this.isColliding = isColliding;
-            this.wasCollidingLastFrame = wasColliding;
+            PositionOfCollidingObject = position;
         }
     }
 }
