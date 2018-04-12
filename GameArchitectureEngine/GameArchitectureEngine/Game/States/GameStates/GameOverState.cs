@@ -6,21 +6,40 @@ using Microsoft.Xna.Framework;
 
 namespace GameArchitectureEngine
 {
-    class GameOverStat : State
+    class GameOverState : State
     {
+        public GameOverState()
+        {
+            Name = "GameOver";
+        }
+
         public override void Enter(object owner)
         {
-            throw new NotImplementedException();
+            ActionRPG game = owner as ActionRPG;
+
+            if (game != null)
+            {
+
+            }
         }
 
         public override void Exit(object owner)
         {
-            throw new NotImplementedException();
+            ActionRPG game = owner as ActionRPG;
+
+            if (game != null)
+            {
+
+            }
         }
 
         public override void Execute(object owner, GameTime gameTime)
         {
-            throw new NotImplementedException();
+            ActionRPG game = owner as ActionRPG;
+
+            if (game == null) return;
+
+            game.gameState = GameState.GameOverState;
         }
     }
 }

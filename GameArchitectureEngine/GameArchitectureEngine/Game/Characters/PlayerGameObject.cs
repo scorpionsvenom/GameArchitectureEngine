@@ -5,11 +5,20 @@ using System.Text;
 using Microsoft.Xna;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 namespace GameArchitectureEngine
 {
     public class PlayerGameObject : GameObjectBase
-    {        
+    {
+        public delegate void DamageEnemyHandler(PlayerGameObject player, EnemyGameObject victim, CollisionEventArgs e);
+        public event DamageEnemyHandler DamageEnemy;
+
+        FSM fsm;
+
+        WalkState walkState;
+        PlayerAttackState attackState;
+
         private int health;
         public int Health
         {
@@ -28,11 +37,18 @@ namespace GameArchitectureEngine
 
         private Vector2 velocity;
         private Animation walkAnimation;
+        private Animation attackAnimation;
+        private Animation death;
         private AnimationPlayer sprite;
 
         private SpriteEffects flip = SpriteEffects.None;
 
         private bool isAlive = true;
+        public bool IsAlive
+        {
+            get { return isAlive; }
+            set { isAlive = value; }
+        }
 
         private Vector2 lastMouseLocation = Vector2.Zero;
         private float stoppingDistance = 3.0f;
@@ -63,15 +79,13 @@ namespace GameArchitectureEngine
         {
             //TODO: set position from serialised object
             Position = new Vector2(120f, 200f);
-            
-            
-            //Reset(Position);
         }
 
         public override void Initialise()
         {
             health = 50;
             maxHealth = 200;
+            IsAlive = true;
         }
 
         public void LoadContent(ResourceManager resources)
@@ -81,6 +95,8 @@ namespace GameArchitectureEngine
 
             //TODO: Too specific, i think this class shouldn't need to know so many specifics, they should be passed in
             walkAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/WalkSpriteSheet"],0.25f, true);
+            attackAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/Attack"], 0.25f, true);
+            death = new Animation(Resources.SpriteSheets["Sprites/Player/Death"], 0.25f, false);
             sprite.PlayAnimation(walkAnimation);
 
             int width = (int)(walkAnimation.FrameWidth * 0.4f);
@@ -102,17 +118,24 @@ namespace GameArchitectureEngine
         public override void Update(GameTime gameTime)
         {
             this.gameTime = gameTime;
-            //TODO: use idle animation if velocity is 0, or dead animation if dead
+
+            isAlive = !(health <= 0);
+
             if (isAlive)
+            {
                 sprite.PlayAnimation(walkAnimation);
-            //else
 
-            if (Vector2.Distance(lastMouseLocation, Position) < stoppingDistance)
-                velocity = Vector2.Zero;
+                if (Vector2.Distance(lastMouseLocation, Position) < stoppingDistance)
+                    velocity = Vector2.Zero;
+                else
+                    Position += velocity;
+
+                BoundingBox = BoundingRectangle;
+            }
             else
-                Position += velocity;
-
-            BoundingBox = BoundingRectangle;
+            {
+                sprite.PlayAnimation(death);
+            }
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -161,7 +184,12 @@ namespace GameArchitectureEngine
 
         public override void OnCollision(Collidable col)
         {
-            
+            EnemyGameObject enemy = col as EnemyGameObject;
+
+            if (enemy != null)
+            {
+
+            }
         }
 
         public void HealPlayer(int amount)
@@ -172,6 +200,18 @@ namespace GameArchitectureEngine
         public void HurtPlayer(int amount)
         {
             health = Math.Max(0, health - amount);
+        }
+
+        public void Attack()
+        {
+            sprite.PlayAnimation(attackAnimation);
+            Velocity = Vector2.Zero;
+            //OnDamageEnemy();
+        }
+
+        public void OnDamageEnemy(EnemyGameObject enemy)
+        {
+            DamageEnemy?.Invoke(this, enemy, new CollisionEventArgs(Position));
         }
     }
 }

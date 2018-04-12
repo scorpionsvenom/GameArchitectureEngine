@@ -9,10 +9,12 @@ namespace GameArchitectureEngine
 {
     public class EnemyGameObject : GameObjectBase
     {
+        public float ChaseSpeed = 88.0f;
+        public float WanderSpeed = 48.0f;
+        public float FleeSpeed = 96.0f;
+
         public delegate void DamagePlayerHandler(object sender, CollisionEventArgs e);
         public event DamagePlayerHandler DamagePlayer;
-        public bool previouslyColliding = false;
-        public bool currentlyColliding = false;
 
         public FSM fsm;
         public IdleState idle;
@@ -23,7 +25,6 @@ namespace GameArchitectureEngine
         GameTime gameTime;
 
         Animation idleAnimation;
-        Animation walkingAnimation;
         Animation attackAnimation;
         Animation dieAnimation;
 
@@ -56,6 +57,10 @@ namespace GameArchitectureEngine
         private SpriteEffects flip = SpriteEffects.None;
 
         bool isAlive = true;
+        public bool IsAlive
+        {
+            get { return isAlive; }
+        }
 
         private float speed = 64.0f;
         public float Speed
@@ -228,12 +233,9 @@ namespace GameArchitectureEngine
 
         public void Attack()
         {
-            Console.WriteLine("Attack!");
             sprite.PlayAnimation(attackAnimation);
             Velocity = Vector2.Zero;
-
-            //if (!previouslyColliding && currentlyColliding)
-                OnDamagePlayer();
+            OnDamagePlayer();
         }
 
         public void OnDamagePlayer()

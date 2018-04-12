@@ -10,7 +10,6 @@ namespace GameArchitectureEngine
     {
         private const double directionChangeTime = 1.25;
         private double currentTime = 0.0;
-        private float wanderSpeed = 48;
 
         public IdleState()
         {
@@ -22,7 +21,7 @@ namespace GameArchitectureEngine
             //Define enemy and behaviour initialisation
             EnemyGameObject enemy = owner as EnemyGameObject;
 
-            if (enemy != null) enemy.Speed = wanderSpeed;
+            if (enemy != null) enemy.Speed = enemy.WanderSpeed;
 
             currentTime = 0.0;
         }
@@ -31,7 +30,7 @@ namespace GameArchitectureEngine
         {
             EnemyGameObject enemy = owner as EnemyGameObject;
 
-            if (enemy != null) enemy.Speed = wanderSpeed;
+            if (enemy != null) enemy.Speed = enemy.WanderSpeed;
 
             currentTime = 0.0f;
         }

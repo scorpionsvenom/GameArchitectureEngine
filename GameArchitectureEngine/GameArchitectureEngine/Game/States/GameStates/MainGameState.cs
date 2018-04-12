@@ -8,21 +8,46 @@ namespace GameArchitectureEngine
 {
     class MainGameState : State
     {
+        private const double SceneChangeTime = 1.25;
+        private double currentTime = 0.0;
+
+        public MainGameState()
+        {
+            Name = "MainGame";
+        }
+
         public override void Enter(object owner)
         {
-            throw new NotImplementedException();
+            ActionRPG game = owner as ActionRPG;
+
+            if (game != null)
+            {
+                //game.ResetScene();
+                game.gameState = GameState.MainGameState;
+                game.Player.HealPlayer(50);
+                game.Player.IsAlive = true;
+                
+                game.Player.Position = new Vector2(120f, 200f);                
+            }
         }
 
         public override void Exit(object owner)
         {
-            throw new NotImplementedException();
+            ActionRPG game = owner as ActionRPG;
+
+            if (game != null)
+            {
+
+            }
         }
 
         public override void Execute(object owner, GameTime gameTime)
         {
-            throw new NotImplementedException();
+            ActionRPG game = owner as ActionRPG;
+
+            if (game == null) return;
+
+            
         }
-
-
     }
 }

@@ -31,9 +31,9 @@ namespace GameArchitectureEngine
             Position = position;
         }
 
-        public void LoadContent(Texture2D texture)
+        public void LoadContent(ResourceManager resources)
         {
-            displayAnimation = new Animation(texture, 0.5f, true);
+            displayAnimation = new Animation(resources.SpriteSheets["Sprites/Powerups/Potion"], 0.5f, true);
             //sprite = new AnimationPlayer();
             sprite.PlayAnimation(displayAnimation);
 

@@ -12,18 +12,35 @@ using System.IO;
 
 namespace GameArchitectureEngine
 {
+    public enum GameState
+    {
+        IntroState = 0,
+        MainGameState = 1,
+        GameOverState = 2,
+    }
     /// <summary>
     /// This is the main type for your game
     /// </summary>
     public class ActionRPG : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        
+        const int ScreenHeight = 768;
+        const int ScreenWidth = 1024;
+
         ResourceManager Resources;
         CommandManager Commands;
         MapManager mapManager;
 
         CollisionManager collisionManager;
+
+        FSM fsm;
+        IntroScreenState introState;
+        MainGameState mainGameState;
+        GameOverState gameOverState;
+
+        bool spacePressed = false;
+        
+        public GameState gameState = GameState.IntroState;
 
         //TODO: have a dictionary of gameobjectbases, so that appropriate methods can be called on each of these in an easier way
         List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
@@ -53,8 +70,27 @@ namespace GameArchitectureEngine
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize()
-        {            
-            // TODO: Add your initialization logic here
+        {
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferHeight = ScreenHeight;
+            graphics.PreferredBackBufferWidth = ScreenWidth;
+            graphics.ApplyChanges();
+
+            fsm = new FSM(this);
+            introState = new IntroScreenState();
+            mainGameState = new MainGameState();
+            gameOverState = new GameOverState();
+
+            introState.AddTransitions(new Transition(mainGameState, () => spacePressed));
+            mainGameState.AddTransitions(new Transition(gameOverState, () => (!player.IsAlive)));
+            gameOverState.AddTransitions(new Transition(introState, () => spacePressed));
+
+            fsm.AddState(introState);
+            fsm.AddState(mainGameState);
+            fsm.AddState(gameOverState);
+
+            fsm.Initialise("Intro");
+
             Resources = new ResourceManager();
             Commands = new CommandManager();
             mapManager = new MapManager(Resources); //TODO: don't think MapManager should need Resources passed in
@@ -65,6 +101,7 @@ namespace GameArchitectureEngine
             mousePointer = new MousePointer();
 
             //TODO: this should be added to the list from the map
+            //ResetScene();
             potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
             enemies.Add(new EnemyGameObject(new Vector2(350, 350), player, 15, 100));
             enemies.Add(new EnemyGameObject(new Vector2(500, 400), player, 100, 100));
@@ -72,6 +109,8 @@ namespace GameArchitectureEngine
             //TEstings
             foreach (EnemyGameObject enemy in enemies)
                 enemy.DamagePlayer += HurtPlayerTest;
+
+            player.DamageEnemy += HurtEnemyTest;
 
             InitialiseCollidableObjects();
 
@@ -94,15 +133,11 @@ namespace GameArchitectureEngine
             mousePointer.LoadContent(Resources);
 
             foreach (HealthPotionGameObject potion in potions)
-                potion.LoadContent(Resources.SpriteSheets["Sprites/Powerups/Potion"]);
+                potion.LoadContent(Resources);
 
             foreach (EnemyGameObject enemy in enemies)
-                enemy.LoadContent(Resources);// Resources.SpriteSheets["Sprites/Enemies/EnemyIdle"]);
-
-            //mapManager.AddMapTileTypes("Earth", (int)enumMapTileType.Earth, 0, 0);
-            //mapManager.AddMapTileTypes("Grass", (int)enumMapTileType.Grass, 64, 0);
-            //mapManager.AddMapTileTypes("Water", (int)enumMapTileType.Water, 0, 64);
-            //mapManager.AddMapTileTypes("Mountain", (int)enumMapTileType.Mountain, 64, 64);
+                enemy.LoadContent(Resources);
+                        
             mapManager.AddMapTileTypes("GrassTL", (int)enumMapTileType.GrassTL, 0, 0);
             mapManager.AddMapTileTypes("GrassT", (int)enumMapTileType.GrassT, 64, 0);
             mapManager.AddMapTileTypes("GrassTR", (int)enumMapTileType.GrassTR, 128, 0);
@@ -126,7 +161,9 @@ namespace GameArchitectureEngine
             mapManager.AddMapTileTypes("EarthBL", (int)enumMapTileType.EarthBL, 192, 128);
             mapManager.AddMapTileTypes("EarthB", (int)enumMapTileType.EarthB, 256, 128);
             mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 320, 128);
-
+            
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);//Content.Load<Song>("Sounds/Music"));
         }
 
         /// <summary>
@@ -135,7 +172,6 @@ namespace GameArchitectureEngine
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
             Resources.UnloadContent(Content);
         }
 
@@ -151,6 +187,8 @@ namespace GameArchitectureEngine
             //    this.Exit();
 
             // TODO: Add your update logic here
+            fsm.Update(gameTime);
+
             ResolveRemovals();
             collisionManager.Update();
             Commands.Update();
@@ -173,26 +211,59 @@ namespace GameArchitectureEngine
         {
             GraphicsDevice.Clear(Color.White);
 
-            //graphics.GraphicsDevice.Viewport.X = player.Position.X - graphics.GraphicsDevice.Viewport.TitleSafeArea.X / 2;
-            //graphics.GraphicsDevice.Viewport.Y = player.Position.Y - graphics.GraphicsDevice.Viewport.TitleSafeArea.Y / 2;
+            switch (gameState)
+            {
+                case (GameState.IntroState):
+                    DrawIntroScreen();
+                    break;
+                case (GameState.MainGameState):
+                    DrawMainGame(gameTime); 
+                    break;
+                case (GameState.GameOverState):
+                    DrawGameOver();
+                    break;
+                default:
+                    DrawIntroScreen();
+                    break;
+            }
+            //base.Draw(gameTime);
+        }
 
+        public void DrawIntroScreen()
+        {
+            spriteBatch.Begin();
+            {
+                spriteBatch.Draw(Resources.Screens["Screens/TitleScreen"], new Vector2(0.0f, 0.0f), Color.White);
+            }
+            spriteBatch.End();
+        }
+
+        public void DrawMainGame(GameTime gameTime)
+        {
             spriteBatch.Begin();
             {
                 mapManager.Draw(Resources.Maps["Maps/0"], spriteBatch);
 
-                foreach(HealthPotionGameObject potion in potions)
-                    potion.Draw(gameTime, spriteBatch);
+                foreach (HealthPotionGameObject potion in potions)
+                potion.Draw(gameTime, spriteBatch);
 
                 foreach (EnemyGameObject enemy in enemies)
-                    enemy.Draw(gameTime, spriteBatch);
+                enemy.Draw(gameTime, spriteBatch);
 
                 player.Draw(gameTime, spriteBatch);
                 mousePointer.Draw(spriteBatch);
                 DrawHUD();
-            }        
+            }
             spriteBatch.End();
+        }
 
-            base.Draw(gameTime);
+        public void DrawGameOver()
+        {
+            spriteBatch.Begin();
+            {
+                spriteBatch.Draw(Resources.Screens["Screens/GameOverScreen"], new Vector2(0.0f, 0.0f), Color.White);
+            }
+            spriteBatch.End();
         }
 
         private void DrawHUD()
@@ -213,9 +284,7 @@ namespace GameArchitectureEngine
         }
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color colour)
-        {
-            //Resources.SprBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
-            //Resources.SprBatch.DrawString(font, value, position, colour);
+        {            
             spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
             spriteBatch.DrawString(font, value, position, colour);
         }
@@ -223,6 +292,7 @@ namespace GameArchitectureEngine
         private void InitialiseBindings()
         {
             Commands.AddKeyboardBindings(Keys.Escape, StopGame);
+            Commands.AddKeyboardBindings(Keys.Space, GoToNextScreen);
             Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
         }
 
@@ -231,6 +301,16 @@ namespace GameArchitectureEngine
             if (buttonState == eButtonState.DOWN)
             {
                 Exit();
+            }
+        }
+
+        public void GoToNextScreen(eButtonState buttonState, Vector2 amount)
+        {
+            if (spacePressed) spacePressed = false;
+
+            if (buttonState == eButtonState.DOWN)
+            {
+                spacePressed = true;
             }
         }
 
@@ -268,9 +348,31 @@ namespace GameArchitectureEngine
             collisionManager.RemoveCollidable(toRemove);
         }
 
+        public void HurtEnemyTest(PlayerGameObject player, EnemyGameObject enemy, EventArgs e)
+        {
+            
+        }
+
         public void HurtPlayerTest(object sender, EventArgs e)
         {            
             player.HurtPlayer(25);
+        }
+
+        //TODO: wire this up
+        public void HealPlayerTest(object sender, EventArgs e)
+        {
+            player.HealPlayer(50);
+        }
+
+        public void ResetScene()
+        {
+            potions.Clear();
+            enemies.Clear();
+
+            potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
+            enemies.Add(new EnemyGameObject(new Vector2(350, 350), player, 15, 100));
+            enemies.Add(new EnemyGameObject(new Vector2(500, 400), player, 100, 100));
+            //Initialize();
         }
     }
 }

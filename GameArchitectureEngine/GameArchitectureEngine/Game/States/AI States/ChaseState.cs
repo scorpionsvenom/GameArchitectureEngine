@@ -19,7 +19,7 @@ namespace GameArchitectureEngine
 
             if (enemy != null)
             {
-                enemy.Speed = 64;
+                enemy.Speed = enemy.ChaseSpeed;
             }
         }
 
@@ -29,7 +29,7 @@ namespace GameArchitectureEngine
 
             if (enemy != null)
             {
-                enemy.Speed = 64;
+                enemy.Speed = enemy.ChaseSpeed;
             }
         }
 

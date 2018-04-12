@@ -29,53 +29,52 @@ namespace GameArchitectureEngine
         public Dictionary<string, SpriteFont> Fonts;
         public Dictionary<string, SoundEffect> SFX;
         public Dictionary<string, Song> Songs;
-        public Dictionary<string, Map> Maps;        
+        public Dictionary<string, Map> Maps;
+        public Dictionary<string, Texture2D> Screens;     
 
         #endregion
 
         #region privates
         private List<string> completePaths = new List<string>();
 
-        private SpriteBatch spriteBatch;
+        //private SpriteFont hudFont;
 
-        private SpriteFont hudFont;
+        //private Texture2D successOverlay;
+        //private Texture2D pauseOverlay;
+        //private Texture2D failureOverlay;
 
-        private Texture2D successOverlay;
-        private Texture2D pauseOverlay;
-        private Texture2D failureOverlay;
+        //private Texture2D playerIdle;
+        //private Texture2D playerWalk;
+        //private Texture2D playerAttack;
+        //private Texture2D playerDie;
 
-        private Texture2D playerIdle;
-        private Texture2D playerWalk;
-        private Texture2D playerAttack;
-        private Texture2D playerDie;
+        //private Texture2D playerSwordSwing;
 
-        private Texture2D playerSwordSwing;
+        //private Texture2D enemy1Idle;
+        //private Texture2D enemy1Walk;
+        //private Texture2D enemy1Attack;
+        //private Texture2D enemy1Die;
 
-        private Texture2D enemy1Idle;
-        private Texture2D enemy1Walk;
-        private Texture2D enemy1Attack;
-        private Texture2D enemy1Die;
+        //private Texture2D tileSet;
 
-        private Texture2D tileSet;
+        //private int numberOfLevels;
 
-        private int numberOfLevels;
-
-        private Song[] songs;
-        private SoundEffect[] sfx;
+        //private Song[] songs;
+        //private SoundEffect[] sfx;
 
         private GraphicsDevice graphicsDevice;
 
         private FileLoader fileLoader;
-        private FileStream fileStream;
+        //private FileStream fileStream;
 
         int extensionLength = 4;
         #endregion
 
         #region Accessors
-        public SpriteBatch SprBatch
-        {
-            get { return spriteBatch; }
-        }
+        //public SpriteBatch SprBatch
+        //{
+        //    get { return spriteBatch; }
+        //}
 
         public GraphicsDevice GraphicsDevice
         {
@@ -161,10 +160,10 @@ namespace GameArchitectureEngine
         ////    get { return songs; }
         ////}
 
-        public SoundEffect[] Sfx
-        {
-            get { return sfx; }
-        }
+        //public SoundEffect[] Sfx
+        //{
+        //    get { return sfx; }
+        //}
         #endregion
 
         ///<summary>
@@ -177,9 +176,12 @@ namespace GameArchitectureEngine
             SpriteSheets = new Dictionary<string, Texture2D>();
             SFX = new Dictionary<string, SoundEffect>();
             Songs = new Dictionary<string, Song>();
+            SFX = new Dictionary<string, SoundEffect>();
             Fonts = new Dictionary<string, SpriteFont>();
             Overlays = new Dictionary<string, Texture2D>();
             Maps = new Dictionary<string, Map>();
+            Screens = new Dictionary<string, Texture2D>();
+
             //Get current working directory
             string directory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
@@ -213,7 +215,6 @@ namespace GameArchitectureEngine
                 {
                     foreach (string file in Directory.GetFiles(dir))
                     {
-                        //Console.WriteLine(file);
                         completePaths.Add(file);
                     }
                     DirectorySearch(dir);
@@ -237,8 +238,9 @@ namespace GameArchitectureEngine
             string overlays = "Overlays";
             string sprites = "Sprites";
             string maps = "Maps";
-            string sounds = "Sounds";
             string songs = "Songs";
+            string sfx = "SFX";
+            string screens = "Screens";
 
             //TODO make this less reliant on the game programmer remembering to include all these types of asshats!!! maybe just some error checking            
             foreach (string path in paths)
@@ -273,15 +275,20 @@ namespace GameArchitectureEngine
                     Overlays.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                     //Console.WriteLine("overlays found: " + cleanedPath);
                 }
-                else if (path.Contains(sounds))
+                else if (path.Contains(sfx))
                 {
                     SFX.Add(cleanedPath, Content.Load<SoundEffect>(cleanedPath));
                     //Console.WriteLine("sounds found: " + cleanedPath);
                 }
                 else if (path.Contains(songs))
                 {
-                    Songs.Add(cleanedPath, Content.Load<Song>(cleanedPath));
+                    if (!Songs.ContainsKey(cleanedPath))
+                        Songs.Add(cleanedPath, Content.Load<Song>(cleanedPath));
                     //Console.WriteLine("songs found: " + cleanedPath);
+                }
+                else if (path.Contains(screens))
+                {
+                    Screens.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                 }
                 else
                 {
