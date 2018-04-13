@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using System.IO;
 
 namespace GameArchitectureEngine
 {
@@ -18,14 +13,17 @@ namespace GameArchitectureEngine
         MainGameState = 1,
         GameOverState = 2,
     }
+
     /// <summary>
     /// This is the main type for your game
     /// </summary>
     public class ActionRPG : Microsoft.Xna.Framework.Game
     {
+        List<GameObjectBase> characters;
+
         GraphicsDeviceManager graphics;
-        const int ScreenHeight = 768;
-        const int ScreenWidth = 1024;
+        const int ScreenHeight = 600;
+        const int ScreenWidth = 800;
 
         ResourceManager Resources;
         CommandManager Commands;
@@ -76,6 +74,8 @@ namespace GameArchitectureEngine
             graphics.PreferredBackBufferWidth = ScreenWidth;
             graphics.ApplyChanges();
 
+            characters = new List<GameObjectBase>();
+
             fsm = new FSM(this);
             introState = new IntroScreenState();
             mainGameState = new MainGameState();
@@ -93,29 +93,37 @@ namespace GameArchitectureEngine
 
             Resources = new ResourceManager();
             Commands = new CommandManager();
-            mapManager = new MapManager(Resources); //TODO: don't think MapManager should need Resources passed in
+            mapManager = new MapManager(); //TODO: don't think MapManager should need Resources passed in
             collisionManager = new CollisionManager();
 
             player = new PlayerGameObject();
             player.Initialise();
+            characters.Add(player);
+
             mousePointer = new MousePointer();
+            characters.Add(mousePointer);
 
             //TODO: this should be added to the list from the map
-            //ResetScene();
             potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
             enemies.Add(new EnemyGameObject(new Vector2(350, 350), player, 15, 100));
             enemies.Add(new EnemyGameObject(new Vector2(500, 400), player, 100, 100));
+                        
+            foreach (EnemyGameObject enemy in enemies) 
+            {
+                characters.Add(enemy);
+            }
 
-            //TEstings
+            //TODO: manage TEstings
             foreach (EnemyGameObject enemy in enemies)
                 enemy.DamagePlayer += HurtPlayerTest;
+
+            foreach (HealthPotionGameObject potion in potions)
+                potion.HealPlayer += HealPlayerTest;
 
             player.DamageEnemy += HurtEnemyTest;
 
             InitialiseCollidableObjects();
-
-            //this.IsMouseVisible = true;
-
+            
             base.Initialize();
 
             InitialiseBindings();
@@ -129,39 +137,20 @@ namespace GameArchitectureEngine
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Resources.LoadContent(Content, GraphicsDevice);
-            player.LoadContent(Resources);
-            mousePointer.LoadContent(Resources);
+
+            foreach(GameObjectBase gameObject in characters)
+            {
+                gameObject.LoadContent(Resources);
+            }
 
             foreach (HealthPotionGameObject potion in potions)
+            {
                 potion.LoadContent(Resources);
+            }
 
-            foreach (EnemyGameObject enemy in enemies)
-                enemy.LoadContent(Resources);
-                        
-            mapManager.AddMapTileTypes("GrassTL", (int)enumMapTileType.GrassTL, 0, 0);
-            mapManager.AddMapTileTypes("GrassT", (int)enumMapTileType.GrassT, 64, 0);
-            mapManager.AddMapTileTypes("GrassTR", (int)enumMapTileType.GrassTR, 128, 0);
+            mapManager.LoadContent(Resources);
+            LoadMapTypes();
 
-            mapManager.AddMapTileTypes("EarthTL", (int)enumMapTileType.EarthTL, 192, 0);
-            mapManager.AddMapTileTypes("EarthT", (int)enumMapTileType.EarthT, 256, 0);
-            mapManager.AddMapTileTypes("EarthTR", (int)enumMapTileType.EarthTR, 320, 0);
-
-            mapManager.AddMapTileTypes("GrassL", (int)enumMapTileType.GrassL, 0, 64);
-            mapManager.AddMapTileTypes("GrassM", (int)enumMapTileType.GrassM, 64, 64);
-            mapManager.AddMapTileTypes("GrassR", (int)enumMapTileType.GrassR, 128, 64);
-
-            mapManager.AddMapTileTypes("EarthL", (int)enumMapTileType.EarthL, 192, 64);
-            mapManager.AddMapTileTypes("EarthM", (int)enumMapTileType.EarthM, 256, 64);
-            mapManager.AddMapTileTypes("EarthR", (int)enumMapTileType.EarthR, 320, 64);
-
-            mapManager.AddMapTileTypes("GrassBL", (int)enumMapTileType.GrassBL, 0, 128);
-            mapManager.AddMapTileTypes("GrassB", (int)enumMapTileType.GrassB, 64, 128);
-            mapManager.AddMapTileTypes("GrassBR", (int)enumMapTileType.GrassBR, 128, 128);
-
-            mapManager.AddMapTileTypes("EarthBL", (int)enumMapTileType.EarthBL, 192, 128);
-            mapManager.AddMapTileTypes("EarthB", (int)enumMapTileType.EarthB, 256, 128);
-            mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 320, 128);
-            
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);//Content.Load<Song>("Sounds/Music"));
         }
@@ -182,25 +171,69 @@ namespace GameArchitectureEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-            //    this.Exit();
+            fsm.Update(gameTime);
 
+            ResolveRemovals();
+            //collisionManager.Update();
+            Commands.Update();
+
+            switch (gameState)
+            {
+                case (GameState.IntroState):
+                    UpdateIntro(gameTime);
+                    break;
+                case (GameState.MainGameState):
+                    UpdateMainGame(gameTime);
+                    break;
+                case (GameState.GameOverState):
+                    UpdateGameOver(gameTime);
+                    break;
+                default:
+                    DrawIntroScreen();
+                    break;
+            }
+
+            
+            //// TODO: Add your update logic here
+            //fsm.Update(gameTime);
+
+            //ResolveRemovals();
+            //collisionManager.Update();
+            //Commands.Update();
+            
+            ////want to update everything except potions
+            //foreach(GameObjectBase gameObject in characters)
+            //{
+            //    gameObject.Update(gameTime);               
+            //}            
+
+            //base.Update(gameTime);
+        }
+
+        private void UpdateIntro(GameTime gameTime)
+        {
+            
+        }
+
+        private void UpdateMainGame(GameTime gameTime)
+        {
             // TODO: Add your update logic here
             fsm.Update(gameTime);
 
             ResolveRemovals();
-            collisionManager.Update();
+            //collisionManager.Update();
             Commands.Update();
 
-            foreach (EnemyGameObject enemy in enemies)
-                enemy.Update(gameTime);
+            //want to update everything except potions
+            foreach (GameObjectBase gameObject in characters)
+            {
+                gameObject.Update(gameTime);
+            }
+        }
 
-            player.Update(gameTime);
-            mousePointer.Update();
-
-
-            base.Update(gameTime);
+        private void UpdateGameOver(GameTime gameTime)
+        {
+            
         }
 
         /// <summary>
@@ -226,7 +259,6 @@ namespace GameArchitectureEngine
                     DrawIntroScreen();
                     break;
             }
-            //base.Draw(gameTime);
         }
 
         public void DrawIntroScreen()
@@ -242,16 +274,22 @@ namespace GameArchitectureEngine
         {
             spriteBatch.Begin();
             {
-                mapManager.Draw(Resources.Maps["Maps/0"], spriteBatch);
+                mapManager.Draw(Resources.Maps["Maps/0"], Resources.TileSheets[@"TileSheet/0"], spriteBatch);                
 
-                foreach (HealthPotionGameObject potion in potions)
-                potion.Draw(gameTime, spriteBatch);
+                foreach(EnemyGameObject enemy in enemies)
+                {
+                    enemy.Draw(gameTime, spriteBatch);
+                }
 
-                foreach (EnemyGameObject enemy in enemies)
-                enemy.Draw(gameTime, spriteBatch);
+                foreach(HealthPotionGameObject potion in potions)
+                {
+                    potion.Draw(gameTime, spriteBatch);
+                }
 
                 player.Draw(gameTime, spriteBatch);
-                mousePointer.Draw(spriteBatch);
+
+                mousePointer.Draw(gameTime, spriteBatch);
+
                 DrawHUD();
             }
             spriteBatch.End();
@@ -362,6 +400,33 @@ namespace GameArchitectureEngine
         public void HealPlayerTest(object sender, EventArgs e)
         {
             player.HealPlayer(50);
+        }
+
+        private void LoadMapTypes()
+        {
+            mapManager.AddMapTileTypes("GrassTL", (int)enumMapTileType.GrassTL, 0, 0);
+            mapManager.AddMapTileTypes("GrassT", (int)enumMapTileType.GrassT, 64, 0);
+            mapManager.AddMapTileTypes("GrassTR", (int)enumMapTileType.GrassTR, 128, 0);
+
+            mapManager.AddMapTileTypes("EarthTL", (int)enumMapTileType.EarthTL, 192, 0);
+            mapManager.AddMapTileTypes("EarthT", (int)enumMapTileType.EarthT, 256, 0);
+            mapManager.AddMapTileTypes("EarthTR", (int)enumMapTileType.EarthTR, 320, 0);
+
+            mapManager.AddMapTileTypes("GrassL", (int)enumMapTileType.GrassL, 0, 64);
+            mapManager.AddMapTileTypes("GrassM", (int)enumMapTileType.GrassM, 64, 64);
+            mapManager.AddMapTileTypes("GrassR", (int)enumMapTileType.GrassR, 128, 64);
+
+            mapManager.AddMapTileTypes("EarthL", (int)enumMapTileType.EarthL, 192, 64);
+            mapManager.AddMapTileTypes("EarthM", (int)enumMapTileType.EarthM, 256, 64);
+            mapManager.AddMapTileTypes("EarthR", (int)enumMapTileType.EarthR, 320, 64);
+
+            mapManager.AddMapTileTypes("GrassBL", (int)enumMapTileType.GrassBL, 0, 128);
+            mapManager.AddMapTileTypes("GrassB", (int)enumMapTileType.GrassB, 64, 128);
+            mapManager.AddMapTileTypes("GrassBR", (int)enumMapTileType.GrassBR, 128, 128);
+
+            mapManager.AddMapTileTypes("EarthBL", (int)enumMapTileType.EarthBL, 192, 128);
+            mapManager.AddMapTileTypes("EarthB", (int)enumMapTileType.EarthB, 256, 128);
+            mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 320, 128);
         }
 
         public void ResetScene()

@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GameArchitectureEngine
 {
-    public class MapManager //: IDisposable
+    public class MapManager//: IDisposable
     {
         private Dictionary<int, MapTileType> mapTileTypes;
         private List<int> usedValues;
@@ -28,21 +28,25 @@ namespace GameArchitectureEngine
             get { return resources; }
         }
 
+        private Map map;
+
         ///<summary>
         /// Build the map
         /// </summary>
-        public MapManager(ResourceManager resources) //TODO remove resources?
+        public MapManager() 
         {
             mapTileTypes = new Dictionary<int, MapTileType>();
-            usedValues = new List<int>();
-            this.resources = resources;            
+            usedValues = new List<int>();       
         }
 
+        public void LoadContent(ResourceManager Resources)
+        {
+            resources = Resources;
+        }
 
-        public void Draw(Map map, SpriteBatch spriteBatch)
+        public void Draw(Map map, Texture2D tileSheet, SpriteBatch spriteBatch)
         {
             List<string[]> mapList = map.MapList;
-
 
             //TODO column or row major?
             for (int i = 0; i < mapList.Count; i++)
@@ -78,7 +82,7 @@ namespace GameArchitectureEngine
                     Vector2 position = new Vector2(j * 64, i * 64);
 
                     //TODO this resource should be passed in by caller, not stored internally. Not generic enough
-                    Texture2D texture = Resources.TileSheets[@"TileSheet/0"];
+                    Texture2D texture = tileSheet;
                     //TODO too many magic numbers...details should be passed in.
                     spriteBatch.Draw(texture, position, source, Color.White, 0.0f, origin, 1.0f, SpriteEffects.None, .8f);
                 }

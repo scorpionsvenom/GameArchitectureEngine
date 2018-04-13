@@ -9,6 +9,8 @@ namespace GameArchitectureEngine
 {
     public class HealthPotionGameObject : GameObjectBase
     {
+        public event HealPlayerHandler HealPlayer;
+
         public Collidable Collidable;
         private Animation displayAnimation;
         private AnimationPlayer sprite;
@@ -31,7 +33,7 @@ namespace GameArchitectureEngine
             Position = position;
         }
 
-        public void LoadContent(ResourceManager resources)
+        public override void LoadContent(ResourceManager resources)
         {
             displayAnimation = new Animation(resources.SpriteSheets["Sprites/Powerups/Potion"], 0.5f, true);
             //sprite = new AnimationPlayer();
@@ -47,12 +49,12 @@ namespace GameArchitectureEngine
             BoundingBox = new Rectangle(BoundingRectangle.X, BoundingRectangle.Y, BoundingRectangle.Width, BoundingRectangle.Height);
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
 
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch sprBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch sprBatch)
         {
             sprite.Draw(gameTime, sprBatch, Position, SpriteEffects.None);
 
@@ -79,6 +81,23 @@ namespace GameArchitectureEngine
 
                 flagForRemoval = true;
             }
+        }
+
+        public override void Reset(Vector2 position)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Heal()
+        {
+            //sprite.PlayAnimation(attackAnimation);
+            //Velocity = Vector2.Zero;
+            OnHealPlayer();
+        }
+
+        public void OnHealPlayer()
+        {
+            HealPlayer?.Invoke(this, new CollisionEventArgs(Position));
         }
     }
 }

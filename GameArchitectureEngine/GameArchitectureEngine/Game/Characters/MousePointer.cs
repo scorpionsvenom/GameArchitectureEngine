@@ -8,18 +8,18 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GameArchitectureEngine
 {
-    public class MousePointer
+    public class MousePointer : GameObjectBase
     {
         public Texture2D Icon;
         public MouseState mouseState;
         public Vector2 Position;
 
-        public void LoadContent(ResourceManager resources)
+        public override void LoadContent(ResourceManager resources)
         {
             Icon = resources.SpriteSheets["Sprites/Player/MouseIcon"];
         }
 
-        public void Update()
+        public override void Update(GameTime gameTime)
         {
             mouseState = Mouse.GetState();
 
@@ -27,9 +27,14 @@ namespace GameArchitectureEngine
             Position.Y = mouseState.Y;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(Icon, Position, Color.White);
+        }
+
+        public override void Reset(Vector2 position)
+        {
+            throw new NotImplementedException();
         }
     }
 }

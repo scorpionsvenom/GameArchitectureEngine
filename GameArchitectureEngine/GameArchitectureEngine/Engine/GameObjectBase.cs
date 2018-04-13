@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GameArchitectureEngine
 {
     //TODO: make better use of this inheritance
-    public class GameObjectBase : Collidable
+    public abstract class GameObjectBase : Collidable
     {
         private Vector2 position;
         private float rotation;
@@ -36,20 +37,12 @@ namespace GameArchitectureEngine
         {
         }
 
-        public virtual void LoadContent()
-        {
-        }
+        public abstract void LoadContent(ResourceManager Resources);
 
-        public virtual void Reset(Vector2 position)
-        {
-        }
+        public abstract void Reset(Vector2 position);
 
-        public virtual void Update(GameTime gameTime)
-        {
-        }
+        public abstract void Update(GameTime gameTime);
 
-        public virtual void Draw()
-        {
-        }
+        public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
     }
 }

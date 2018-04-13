@@ -88,7 +88,7 @@ namespace GameArchitectureEngine
             IsAlive = true;
         }
 
-        public void LoadContent(ResourceManager resources)
+        public override void LoadContent(ResourceManager resources)
         {
             //TODO: Keep local copy of resource manager, don't think this is a good approach
             Resources = resources;
@@ -138,7 +138,7 @@ namespace GameArchitectureEngine
             }
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             if (Velocity.X > 0)
                 flip = SpriteEffects.FlipHorizontally;

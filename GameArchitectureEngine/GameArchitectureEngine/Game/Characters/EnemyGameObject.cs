@@ -13,7 +13,6 @@ namespace GameArchitectureEngine
         public float WanderSpeed = 48.0f;
         public float FleeSpeed = 96.0f;
 
-        public delegate void DamagePlayerHandler(object sender, CollisionEventArgs e);
         public event DamagePlayerHandler DamagePlayer;
 
         public FSM fsm;
@@ -132,7 +131,7 @@ namespace GameArchitectureEngine
             this.player = player;
         }
 
-        public void LoadContent(ResourceManager resources)
+        public override void LoadContent(ResourceManager resources)
         {
             fsm = new FSM(this);
 
@@ -193,7 +192,7 @@ namespace GameArchitectureEngine
             Position += Velocity;          
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch sprBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch sprBatch)
         {
             if (Velocity.X > 0)
                 flip = SpriteEffects.FlipHorizontally;
@@ -241,6 +240,11 @@ namespace GameArchitectureEngine
         public void OnDamagePlayer()
         {
             DamagePlayer?.Invoke(this, new CollisionEventArgs(Position));
+        }
+
+        public override void Reset(Vector2 position)
+        {
+            throw new NotImplementedException();
         }
     }
 }
