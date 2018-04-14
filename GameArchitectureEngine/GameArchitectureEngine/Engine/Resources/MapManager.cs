@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GameArchitectureEngine
 {
+    /// <summary>
+    /// Assumes a square grid map is passed in as a comma separated value file
+    /// </summary>
     public class MapManager//: IDisposable
     {
         private Dictionary<int, MapTileType> mapTileTypes;
@@ -27,9 +30,16 @@ namespace GameArchitectureEngine
         {
             get { return resources; }
         }
+        
+        /// <summary>
+        /// The width of the map, used to determine level size
+        /// </summary>
+        public int width;
 
-        private Map map;
-
+        ///<summary>
+        /// The height of the map, used to determine level size
+        /// </summary>
+        public int height;
         ///<summary>
         /// Build the map
         /// </summary>
@@ -48,7 +58,6 @@ namespace GameArchitectureEngine
         {
             List<string[]> mapList = map.MapList;
 
-            //TODO column or row major?
             for (int i = 0; i < mapList.Count; i++)
             {
                 for (int j = 0; j < mapList[i].Length; j++)

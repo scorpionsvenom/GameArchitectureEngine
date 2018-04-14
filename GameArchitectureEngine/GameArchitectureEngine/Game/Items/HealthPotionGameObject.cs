@@ -77,8 +77,8 @@ namespace GameArchitectureEngine
             if (player != null)
             {
                 //TODO: fire event to heal player
-                player.HealPlayer(50); 
-
+                //OnHealPlayer(); 
+                player.OnCollisionWithPotion(this);
                 flagForRemoval = true;
             }
         }
@@ -86,13 +86,6 @@ namespace GameArchitectureEngine
         public override void Reset(Vector2 position)
         {
             throw new NotImplementedException();
-        }
-
-        public void Heal()
-        {
-            //sprite.PlayAnimation(attackAnimation);
-            //Velocity = Vector2.Zero;
-            OnHealPlayer();
         }
 
         public void OnHealPlayer()

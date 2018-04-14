@@ -40,7 +40,6 @@ namespace GameArchitectureEngine
         
         public GameState gameState = GameState.IntroState;
 
-        //TODO: have a dictionary of gameobjectbases, so that appropriate methods can be called on each of these in an easier way
         List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
         List<EnemyGameObject> enemies = new List<EnemyGameObject>();
 
@@ -51,7 +50,13 @@ namespace GameArchitectureEngine
         }
 
         public MousePointer mousePointer;
-        //HealthPotionGameObject potion;
+
+        Camera camera;
+
+        Map currentMap;
+        int currentMapIndex;
+        int currentMapWidth;
+        int currentMapHeight;
 
         SpriteBatch spriteBatch;
 
@@ -61,6 +66,7 @@ namespace GameArchitectureEngine
             Content.RootDirectory = "Content";
         }
 
+        #region initialisation
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -73,8 +79,6 @@ namespace GameArchitectureEngine
             graphics.PreferredBackBufferHeight = ScreenHeight;
             graphics.PreferredBackBufferWidth = ScreenWidth;
             graphics.ApplyChanges();
-
-            characters = new List<GameObjectBase>();
 
             fsm = new FSM(this);
             introState = new IntroScreenState();
@@ -93,7 +97,31 @@ namespace GameArchitectureEngine
 
             Resources = new ResourceManager();
             Commands = new CommandManager();
-            mapManager = new MapManager(); //TODO: don't think MapManager should need Resources passed in
+            InitialiseBindings();
+
+            //First time initialising, so start with intro state
+            gameState = GameState.IntroState;
+            InitialiseIntroState();
+
+            camera = new Camera(Vector2.Zero, ScreenWidth, ScreenHeight, ScreenWidth, ScreenHeight);
+
+            base.Initialize();
+        }
+
+        public void InitialiseIntroState()
+        {
+            Commands = new CommandManager();
+
+            InitialiseBindings();
+
+            camera = new Camera(Vector2.Zero, ScreenWidth, ScreenHeight, ScreenWidth, ScreenHeight);
+        }
+
+        public void InitialiseMainGameState()
+        {
+            characters = new List<GameObjectBase>();
+            
+            mapManager = new MapManager(); 
             collisionManager = new CollisionManager();
 
             player = new PlayerGameObject();
@@ -103,17 +131,17 @@ namespace GameArchitectureEngine
             mousePointer = new MousePointer();
             characters.Add(mousePointer);
 
-            //TODO: this should be added to the list from the map
+            //TODO: this should be added to the list from a file
             potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
             enemies.Add(new EnemyGameObject(new Vector2(350, 350), player, 15, 100));
             enemies.Add(new EnemyGameObject(new Vector2(500, 400), player, 100, 100));
-                        
-            foreach (EnemyGameObject enemy in enemies) 
+
+            foreach (EnemyGameObject enemy in enemies)
             {
                 characters.Add(enemy);
             }
 
-            //TODO: manage TEstings
+            //TODO: manage Testings
             foreach (EnemyGameObject enemy in enemies)
                 enemy.DamagePlayer += HurtPlayerTest;
 
@@ -121,14 +149,24 @@ namespace GameArchitectureEngine
                 potion.HealPlayer += HealPlayerTest;
 
             player.DamageEnemy += HurtEnemyTest;
+            player.CollideWithPotion += CollideWithPotionTest;
+            //TODO Remove testings
 
             InitialiseCollidableObjects();
-            
-            base.Initialize();
+
+            Commands = new CommandManager();            
 
             InitialiseBindings();
         }
 
+        public void InitialiseGameOverState()
+        {
+            Commands = new CommandManager();
+            InitialiseBindings();
+        }
+        #endregion
+
+        #region load content
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
@@ -136,9 +174,30 @@ namespace GameArchitectureEngine
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Resources.LoadContent(Content, GraphicsDevice);
+            //Resources.LoadContent(Content, GraphicsDevice);
 
-            foreach(GameObjectBase gameObject in characters)
+            //First time loading so start with intro state
+            gameState = GameState.IntroState;
+            LoadIntroScreenContent();
+
+            base.LoadContent();            
+        }
+
+        public void LoadIntroScreenContent()
+        {
+            if (Resources == null)
+                Resources = new ResourceManager();
+
+            Resources.LoadContent(Content, GraphicsDevice);
+        }
+
+        public void LoadMainGameContent()
+        {
+            Player.HealPlayer(50);
+            Player.IsAlive = true;
+            Player.Position = new Vector2(120f, 200f);
+
+            foreach (GameObjectBase gameObject in characters)
             {
                 gameObject.LoadContent(Resources);
             }
@@ -151,10 +210,26 @@ namespace GameArchitectureEngine
             mapManager.LoadContent(Resources);
             LoadMapTypes();
 
+            currentMapIndex = 0;//TODO get current map index
+
+            currentMap = Resources.Maps[string.Format("Maps/{0}",currentMapIndex)];
+
+            currentMapWidth = currentMap.MapList[0].Length;
+            currentMapHeight = currentMap.MapList.Count;
+
+            camera = new Camera(Vector2.Zero, currentMapWidth, currentMapHeight, ScreenWidth, ScreenHeight);
+
             MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);//Content.Load<Song>("Sounds/Music"));
+            MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);
         }
 
+        public void LoadGameOverContent()
+        {
+            Resources.LoadContent(Content, GraphicsDevice);
+        }
+        #endregion
+
+        #region unload content
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
@@ -162,8 +237,21 @@ namespace GameArchitectureEngine
         protected override void UnloadContent()
         {
             Resources.UnloadContent(Content);
+            base.UnloadContent();
         }
 
+        public void UnloadMainGameContent()
+        {
+            potions.Clear();
+            enemies.Clear();
+            player = null;
+            characters.Clear();
+            collisionManager = null;
+            Commands = null;
+            Resources.UnloadContent(Content);
+        }        
+
+        #endregion
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -171,10 +259,7 @@ namespace GameArchitectureEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            fsm.Update(gameTime);
-
-            ResolveRemovals();
-            //collisionManager.Update();
+            fsm.Update(gameTime);            
             Commands.Update();
 
             switch (gameState)
@@ -189,51 +274,39 @@ namespace GameArchitectureEngine
                     UpdateGameOver(gameTime);
                     break;
                 default:
-                    DrawIntroScreen();
+                    UpdateIntro(gameTime);
                     break;
             }
 
-            
-            //// TODO: Add your update logic here
-            //fsm.Update(gameTime);
-
-            //ResolveRemovals();
-            //collisionManager.Update();
-            //Commands.Update();
-            
-            ////want to update everything except potions
-            //foreach(GameObjectBase gameObject in characters)
-            //{
-            //    gameObject.Update(gameTime);               
-            //}            
-
-            //base.Update(gameTime);
+            base.Update(gameTime);
         }
 
         private void UpdateIntro(GameTime gameTime)
         {
-            
+            GraphicsDevice.Viewport = new Viewport(0, 0, ScreenWidth, ScreenHeight);
         }
 
         private void UpdateMainGame(GameTime gameTime)
         {
-            // TODO: Add your update logic here
-            fsm.Update(gameTime);
-
             ResolveRemovals();
-            //collisionManager.Update();
-            Commands.Update();
+            collisionManager.Update();
 
             //want to update everything except potions
             foreach (GameObjectBase gameObject in characters)
             {
                 gameObject.Update(gameTime);
             }
+
+            camera.LevelWidth = currentMapWidth;
+            camera.LevelHeight = currentMapHeight;
+
+            camera.Update((int)Player.Position.X, (int)Player.Position.Y);
+            GraphicsDevice.Viewport = new Viewport((int)camera.Position.X, (int)camera.Position.Y, ScreenWidth, ScreenHeight);
         }
 
         private void UpdateGameOver(GameTime gameTime)
         {
-            
+            GraphicsDevice.Viewport = new Viewport(0, 0, ScreenWidth, ScreenHeight);
         }
 
         /// <summary>
@@ -274,7 +347,7 @@ namespace GameArchitectureEngine
         {
             spriteBatch.Begin();
             {
-                mapManager.Draw(Resources.Maps["Maps/0"], Resources.TileSheets[@"TileSheet/0"], spriteBatch);                
+                mapManager.Draw(currentMap, Resources.TileSheets[@"TileSheet/0"], spriteBatch);                
 
                 foreach(EnemyGameObject enemy in enemies)
                 {
@@ -331,7 +404,9 @@ namespace GameArchitectureEngine
         {
             Commands.AddKeyboardBindings(Keys.Escape, StopGame);
             Commands.AddKeyboardBindings(Keys.Space, GoToNextScreen);
-            Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
+
+            if (gameState == GameState.MainGameState)
+                Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
         }
 
         public void StopGame(eButtonState buttonState, Vector2 amount)
@@ -386,6 +461,8 @@ namespace GameArchitectureEngine
             collisionManager.RemoveCollidable(toRemove);
         }
 
+        #region event testing
+        //TODO: put these methods into appropriate managing class
         public void HurtEnemyTest(PlayerGameObject player, EnemyGameObject enemy, EventArgs e)
         {
             
@@ -401,6 +478,14 @@ namespace GameArchitectureEngine
         {
             player.HealPlayer(50);
         }
+
+        private void CollideWithPotionTest(object sender, HealthPotionGameObject potion, CollisionEventArgs e)
+        {
+            potion.OnHealPlayer();
+            //throw new NotImplementedException();
+        }
+        #endregion
+
 
         private void LoadMapTypes()
         {

@@ -12,7 +12,6 @@ namespace GameArchitectureEngine
     {
         public Texture2D Icon;
         public MouseState mouseState;
-        public Vector2 Position;
 
         public override void LoadContent(ResourceManager resources)
         {
@@ -23,8 +22,9 @@ namespace GameArchitectureEngine
         {
             mouseState = Mouse.GetState();
 
-            Position.X = mouseState.X;
-            Position.Y = mouseState.Y;
+            Vector2 mousePosition = new Vector2(mouseState.X, mouseState.Y);
+
+            Position = mousePosition;
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

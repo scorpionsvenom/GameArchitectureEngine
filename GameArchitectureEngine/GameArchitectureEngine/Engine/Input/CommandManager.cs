@@ -83,7 +83,8 @@ namespace GameArchitectureEngine
         {
             m_Input.AddButton(button);
 
-            m_MouseButtonBindings.Add(button, action);
+            if (!m_MouseButtonBindings.ContainsKey(button))
+                m_MouseButtonBindings.Add(button, action);
         }
     }
 }

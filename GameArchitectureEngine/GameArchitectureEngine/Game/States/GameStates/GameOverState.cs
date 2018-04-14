@@ -19,7 +19,9 @@ namespace GameArchitectureEngine
 
             if (game != null)
             {
-
+                game.gameState = GameState.GameOverState;
+                game.InitialiseGameOverState();
+                game.LoadGameOverContent();
             }
         }
 

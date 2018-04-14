@@ -19,7 +19,9 @@ namespace GameArchitectureEngine
 
             if (game != null)
             {
-                
+                game.gameState = GameState.IntroState;
+                game.InitialiseIntroState();
+                game.LoadIntroScreenContent();
             }
         }
 
@@ -40,7 +42,7 @@ namespace GameArchitectureEngine
             if (game == null) return;
 
             game.gameState = GameState.IntroState;
-            game.Player.IsAlive = true;
+            //game.Player.IsAlive = true;
         }
     }
 }

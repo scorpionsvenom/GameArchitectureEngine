@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Engine\Animation\Animation.cs" />
     <Compile Include="Engine\Animation\AnimationPlayer.cs" />
+    <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\CollisionHandling\CollisionEventArgs.cs" />
     <Compile Include="Engine\CollisionHandling\CollisionEventManager.cs" />
     <Compile Include="Engine\Delegates.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="Game\States\PlayerStates\WalkState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game\MainGameStuff\Program.cs" />
-    <Compile Include="Game\MainGameStuff\Game1.cs" />
+    <Compile Include="Game\MainGameStuff\ActionRPG.cs" />
     <Compile Include="Engine\Resources\ResourceManager.cs" />
     <Compile Include="Game\Tile\Tile.cs" />
   </ItemGroup>

@@ -7,6 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameArchitectureEngine
 {
+    /// <summary>
+    /// Assumes the map file is a grid of comma separated values.
+    /// </summary>
     public class Map
     {
         private List<string[]> mapList;
@@ -19,15 +22,6 @@ namespace GameArchitectureEngine
         public Map(List<string[]> mapList)
         {
             this.mapList = mapList;
-        }
-
-        public void Update(GameTime gameTime)
-        {
-        }
-
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-
-        }
+        }        
     }
 }

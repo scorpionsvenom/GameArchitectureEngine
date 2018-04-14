@@ -10,9 +10,9 @@ using Microsoft.Xna.Framework.Media;
 namespace GameArchitectureEngine
 {
     public class PlayerGameObject : GameObjectBase
-    {
-        public delegate void DamageEnemyHandler(PlayerGameObject player, EnemyGameObject victim, CollisionEventArgs e);
+    {        
         public event DamageEnemyHandler DamageEnemy;
+        public event CollisionWithPotionHandler CollideWithPotion;
 
         FSM fsm;
 
@@ -212,6 +212,11 @@ namespace GameArchitectureEngine
         public void OnDamageEnemy(EnemyGameObject enemy)
         {
             DamageEnemy?.Invoke(this, enemy, new CollisionEventArgs(Position));
+        }
+
+        public void OnCollisionWithPotion(HealthPotionGameObject potion)
+        {
+            CollideWithPotion?.Invoke(this, potion, new CollisionEventArgs(Position));
         }
     }
 }

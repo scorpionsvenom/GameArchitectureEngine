@@ -21,8 +21,7 @@ namespace GameArchitectureEngine
         /// ie all sprites in a dictionary together keyed off name
         /// which is read from file name and then used to reference them
         /// </summary>
-        #region publics
-        //either have a dictionary of these dictionaries or a list so initialising and disposing of them is easy
+        #region publics        
         public Dictionary<string, Texture2D> SpriteSheets;
         public Dictionary<string, Texture2D> TileSheets;
         public Dictionary<string, Texture2D> Overlays;
@@ -30,140 +29,28 @@ namespace GameArchitectureEngine
         public Dictionary<string, SoundEffect> SFX;
         public Dictionary<string, Song> Songs;
         public Dictionary<string, Map> Maps;
-        public Dictionary<string, Texture2D> Screens;     
+        public Dictionary<string, Texture2D> Screens;
 
         #endregion
 
         #region privates
+        private List<Object> dictionaries;
+
         private List<string> completePaths = new List<string>();
-
-        //private SpriteFont hudFont;
-
-        //private Texture2D successOverlay;
-        //private Texture2D pauseOverlay;
-        //private Texture2D failureOverlay;
-
-        //private Texture2D playerIdle;
-        //private Texture2D playerWalk;
-        //private Texture2D playerAttack;
-        //private Texture2D playerDie;
-
-        //private Texture2D playerSwordSwing;
-
-        //private Texture2D enemy1Idle;
-        //private Texture2D enemy1Walk;
-        //private Texture2D enemy1Attack;
-        //private Texture2D enemy1Die;
-
-        //private Texture2D tileSet;
-
-        //private int numberOfLevels;
-
-        //private Song[] songs;
-        //private SoundEffect[] sfx;
 
         private GraphicsDevice graphicsDevice;
 
         private FileLoader fileLoader;
-        //private FileStream fileStream;
 
         int extensionLength = 4;
         #endregion
 
         #region Accessors
-        //public SpriteBatch SprBatch
-        //{
-        //    get { return spriteBatch; }
-        //}
 
         public GraphicsDevice GraphicsDevice
         {
             get { return graphicsDevice; }
         }
-        //public SpriteFont HudFont
-        //{
-        //    get { return hudFont; }
-        //}
-
-        //public Texture2D SuccessOverlay
-        //{
-        //    get { return successOverlay; }
-        //}
-
-        //public Texture2D PauseOverlay
-        //{
-        //    get { return pauseOverlay; }
-        //}
-
-        //public Texture2D FailureOverlay
-        //{
-        //    get { return failureOverlay; }
-        //}
-
-        //public Texture2D PlayerIdle
-        //{
-        //    get { return playerIdle; }
-        //}
-
-        //public Texture2D PlayerWalk
-        //{
-        //    get { return playerWalk; }
-        //}
-
-        //public Texture2D PlayerAttack
-        //{
-        //    get { return playerAttack; }
-        //}
-
-        //public Texture2D PlayerDie
-        //{
-        //    get { return playerDie; }
-        //}
-
-        //public Texture2D PlayerSwordSwing
-        //{
-        //    get { return playerSwordSwing; }
-        //}
-
-        //public Texture2D Enemy1Idle
-        //{
-        //    get { return enemy1Idle; }
-        //}
-
-        //public Texture2D Enemy1Walk
-        //{
-        //    get { return enemy1Walk; }
-        //}
-
-        //public Texture2D Enemy1Attack
-        //{
-        //    get { return enemy1Attack; }
-        //}
-
-        //public Texture2D Enemy1Die
-        //{
-        //    get { return enemy1Die; }
-        //}
-
-        //public Texture2D TileSet
-        //{
-        //    get { return tileSet; }
-        //}
-
-        //public int NumberOfLevels
-        //{
-        //    get { return numberOfLevels; }
-        //}
-
-        ////public Song[] Songs
-        ////{
-        ////    get { return songs; }
-        ////}
-
-        //public SoundEffect[] Sfx
-        //{
-        //    get { return sfx; }
-        //}
         #endregion
 
         ///<summary>
@@ -171,16 +58,32 @@ namespace GameArchitectureEngine
         ///</summary>
         public void LoadContent(ContentManager Content, GraphicsDevice graphicsDevice)
         {
+            dictionaries = new List<Object>();
+
             //Initialise the dictionaries
             TileSheets = new Dictionary<string, Texture2D>();
+            dictionaries.Add(TileSheets);
+
             SpriteSheets = new Dictionary<string, Texture2D>();
+            dictionaries.Add(SpriteSheets);
+
             SFX = new Dictionary<string, SoundEffect>();
+            dictionaries.Add(SFX);
+
             Songs = new Dictionary<string, Song>();
-            SFX = new Dictionary<string, SoundEffect>();
+            dictionaries.Add(Songs);
+            
             Fonts = new Dictionary<string, SpriteFont>();
+            dictionaries.Add(Fonts);
+
             Overlays = new Dictionary<string, Texture2D>();
+            dictionaries.Add(Overlays);
+
             Maps = new Dictionary<string, Map>();
+            dictionaries.Add(Maps);
+
             Screens = new Dictionary<string, Texture2D>();
+            dictionaries.Add(Screens);
 
             //Get current working directory
             string directory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
@@ -191,14 +94,36 @@ namespace GameArchitectureEngine
             //Add files to dictionaries
             addAssetsToDictionaries(completePaths, Content);
 
-            this.graphicsDevice = graphicsDevice;
-
-            //fileStream = new FileStream();            
+            this.graphicsDevice = graphicsDevice;    
         }
 
         public void UnloadContent(ContentManager Content)
         {
-            //Is it really this easy?
+            //Clear all the dictionaries and unload the content.
+            foreach(Object obj in dictionaries)
+            {
+                Dictionary<string, Texture2D> texture2Ddictionary = obj as Dictionary<string, Texture2D>;
+                Dictionary<string, SoundEffect> sfxDictionary = obj as Dictionary<string, SoundEffect>;
+                Dictionary<string, Song> songDictionary = obj as Dictionary<string, Song>;
+                Dictionary<string, SpriteFont> fontDictionary = obj as Dictionary<string, SpriteFont>;
+                Dictionary<string, Map> mapDictionary = obj as Dictionary<string, Map>;                
+
+                if (texture2Ddictionary != null)
+                    texture2Ddictionary.Clear();
+
+                if (sfxDictionary != null)
+                    sfxDictionary.Clear();
+
+                if (songDictionary != null)
+                    songDictionary.Clear();
+
+                if (fontDictionary != null)
+                    fontDictionary.Clear();
+
+                if (mapDictionary != null)
+                    mapDictionary.Clear();
+            }                
+
             Content.Unload();
         }
 
@@ -249,46 +174,49 @@ namespace GameArchitectureEngine
 
                 if (path.Contains(tileSheet))
                 {
-                    TileSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
-                    //Console.WriteLine("Asset loaded to dictionary: " + TileSheets[cleanedPath].ToString());
+                    if (!TileSheets.ContainsKey(cleanedPath))
+                        TileSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                 }
                 else if (path.Contains(sprites))
                 {
-                    SpriteSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
-                    //Console.WriteLine("sprites found: " + cleanedPath);
+                    if (!SpriteSheets.ContainsKey(cleanedPath))
+                        SpriteSheets.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                 }
                 else if (path.Contains(fonts))
                 {
-                    Fonts.Add(cleanedPath, Content.Load<SpriteFont>(cleanedPath));
-                    //Console.WriteLine("fonts found: " + cleanedPath);
+                    if (!Fonts.ContainsKey(cleanedPath))
+                        Fonts.Add(cleanedPath, Content.Load<SpriteFont>(cleanedPath));
                 }
                 else if (path.Contains(maps))
                 {
-                    fileLoader = new FileLoader();
+                    if (!Maps.ContainsKey(cleanedPath))
+                    {
+                        fileLoader = new FileLoader();
 
-                    Map map = fileLoader.ReadMap(path/*.Substring(path.IndexOf("Content"))*/);
+                        Map map = fileLoader.ReadMap(path);
 
-                    Maps.Add(cleanedPath, map);                    
+                        Maps.Add(cleanedPath, map);
+                    }
                 }
                 else if (path.Contains(overlays))
                 {
-                    Overlays.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
-                    //Console.WriteLine("overlays found: " + cleanedPath);
+                    if (!Overlays.ContainsKey(cleanedPath))
+                        Overlays.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                 }
                 else if (path.Contains(sfx))
                 {
-                    SFX.Add(cleanedPath, Content.Load<SoundEffect>(cleanedPath));
-                    //Console.WriteLine("sounds found: " + cleanedPath);
+                    if (!SFX.ContainsKey(cleanedPath))
+                        SFX.Add(cleanedPath, Content.Load<SoundEffect>(cleanedPath));
                 }
                 else if (path.Contains(songs))
                 {
                     if (!Songs.ContainsKey(cleanedPath))
                         Songs.Add(cleanedPath, Content.Load<Song>(cleanedPath));
-                    //Console.WriteLine("songs found: " + cleanedPath);
                 }
                 else if (path.Contains(screens))
                 {
-                    Screens.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
+                    if (!Screens.ContainsKey(cleanedPath))
+                        Screens.Add(cleanedPath, Content.Load<Texture2D>(cleanedPath));
                 }
                 else
                 {

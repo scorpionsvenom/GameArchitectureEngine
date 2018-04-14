@@ -24,10 +24,13 @@ namespace GameArchitectureEngine
             {
                 //game.ResetScene();
                 game.gameState = GameState.MainGameState;
-                game.Player.HealPlayer(50);
-                game.Player.IsAlive = true;
+                game.InitialiseMainGameState();
+                game.LoadMainGameContent();
+
+                //Load main game content. load correct map
                 
-                game.Player.Position = new Vector2(120f, 200f);                
+                
+                               
             }
         }
 
@@ -37,7 +40,7 @@ namespace GameArchitectureEngine
 
             if (game != null)
             {
-
+                game.UnloadMainGameContent();
             }
         }
 
