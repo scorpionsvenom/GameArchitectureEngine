@@ -153,7 +153,6 @@ namespace GameArchitectureEngine
             if (buttonState == eButtonState.DOWN)
             {
                 float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-                Rectangle safeArea = Resources.GraphicsDevice.Viewport.TitleSafeArea;
                 
                 if (Utilities.IsVectorInsideWindow(mouseLocation, Resources.GraphicsDevice))
                 {
@@ -167,6 +166,10 @@ namespace GameArchitectureEngine
                     direction = direction * speed * elapsedTime;
 
                     Velocity = direction;
+                }
+                else
+                {
+                    //lastMouseLocation = 
                 }
             }
         }

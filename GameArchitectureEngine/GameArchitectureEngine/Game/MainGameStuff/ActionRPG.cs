@@ -52,6 +52,8 @@ namespace GameArchitectureEngine
         public MousePointer mousePointer;
 
         Camera camera;
+        float zoom = 1.0f;
+        float rotation = 0.0f;
 
         Map currentMap;
         int currentMapIndex;
@@ -75,7 +77,7 @@ namespace GameArchitectureEngine
         /// </summary>
         protected override void Initialize()
         {
-            graphics.IsFullScreen = false;
+            graphics.IsFullScreen = true;
             graphics.PreferredBackBufferHeight = ScreenHeight;
             graphics.PreferredBackBufferWidth = ScreenWidth;
             graphics.ApplyChanges();
@@ -103,7 +105,7 @@ namespace GameArchitectureEngine
             gameState = GameState.IntroState;
             InitialiseIntroState();
 
-            camera = new Camera(Vector2.Zero, ScreenWidth, ScreenHeight, ScreenWidth, ScreenHeight);
+            camera = new Camera(GraphicsDevice.Viewport);
 
             base.Initialize();
         }
@@ -113,12 +115,12 @@ namespace GameArchitectureEngine
             Commands = new CommandManager();
 
             InitialiseBindings();
-
-            camera = new Camera(Vector2.Zero, ScreenWidth, ScreenHeight, ScreenWidth, ScreenHeight);
         }
 
         public void InitialiseMainGameState()
         {
+            
+
             characters = new List<GameObjectBase>();
             
             mapManager = new MapManager(); 
@@ -214,11 +216,9 @@ namespace GameArchitectureEngine
 
             currentMap = Resources.Maps[string.Format("Maps/{0}",currentMapIndex)];
 
-            currentMapWidth = currentMap.MapList[0].Length;
-            currentMapHeight = currentMap.MapList.Count;
-
-            camera = new Camera(Vector2.Zero, currentMapWidth, currentMapHeight, ScreenWidth, ScreenHeight);
-
+            currentMapWidth = currentMap.MapList[0].Length * 64;
+            currentMapHeight = currentMap.MapList.Count * 64;
+            
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);
         }
@@ -249,7 +249,27 @@ namespace GameArchitectureEngine
             collisionManager = null;
             Commands = null;
             Resources.UnloadContent(Content);
-        }        
+
+            //#region Constrain mouse to window
+
+            //if (Mouse.GetState().X < 0)
+
+            //    Mouse.SetPosition(0, Mouse.GetState().Y);
+
+            //if (Mouse.GetState().X > ScreenWidth)
+
+            //    Mouse.SetPosition(ScreenHeight, Mouse.GetState().Y);
+
+            //if (Mouse.GetState().Y < 0)
+
+            //    Mouse.SetPosition(Mouse.GetState().X, 0);
+
+            //if (Mouse.GetState().Y > ScreenWidth)
+
+            //    Mouse.SetPosition(Mouse.GetState().X, ScreenHeight);
+
+            //#endregion
+        }
 
         #endregion
         /// <summary>
@@ -283,7 +303,7 @@ namespace GameArchitectureEngine
 
         private void UpdateIntro(GameTime gameTime)
         {
-            GraphicsDevice.Viewport = new Viewport(0, 0, ScreenWidth, ScreenHeight);
+            //GraphicsDevice.Viewport = new Viewport(0, 0, ScreenWidth, ScreenHeight);
         }
 
         private void UpdateMainGame(GameTime gameTime)
@@ -296,17 +316,13 @@ namespace GameArchitectureEngine
             {
                 gameObject.Update(gameTime);
             }
-
-            camera.LevelWidth = currentMapWidth;
-            camera.LevelHeight = currentMapHeight;
-
-            camera.Update((int)Player.Position.X, (int)Player.Position.Y);
-            GraphicsDevice.Viewport = new Viewport((int)camera.Position.X, (int)camera.Position.Y, ScreenWidth, ScreenHeight);
+                        
+            camera.Update(Player.Position, rotation, zoom, currentMapWidth, currentMapHeight);
         }
 
         private void UpdateGameOver(GameTime gameTime)
         {
-            GraphicsDevice.Viewport = new Viewport(0, 0, ScreenWidth, ScreenHeight);
+            
         }
 
         /// <summary>
@@ -345,7 +361,7 @@ namespace GameArchitectureEngine
 
         public void DrawMainGame(GameTime gameTime)
         {
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
             {
                 mapManager.Draw(currentMap, Resources.TileSheets[@"TileSheet/0"], spriteBatch);                
 
