@@ -22,6 +22,7 @@ namespace GameArchitectureEngine
                 game.gameState = GameState.GameOverState;
                 game.InitialiseGameOverState();
                 game.LoadGameOverContent();
+                game.SpacePressed = false;
             }
         }
 
@@ -31,7 +32,7 @@ namespace GameArchitectureEngine
 
             if (game != null)
             {
-
+                game.UnloadGameOverContent();
             }
         }
 

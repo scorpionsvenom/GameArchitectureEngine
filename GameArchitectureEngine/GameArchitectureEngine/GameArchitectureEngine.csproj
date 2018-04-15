@@ -77,7 +77,8 @@
     <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\CollisionHandling\CollisionEventArgs.cs" />
     <Compile Include="Engine\CollisionHandling\CollisionEventManager.cs" />
-    <Compile Include="Engine\Delegates.cs" />
+    <Compile Include="Engine\Events\Delegates.cs" />
+    <Compile Include="Engine\Events\EventManager.cs" />
     <Compile Include="Engine\FiniteStateMachine\FSM.cs" />
     <Compile Include="Engine\Input\ButtonState.cs" />
     <Compile Include="Engine\CollisionHandling\Collidable.cs" />

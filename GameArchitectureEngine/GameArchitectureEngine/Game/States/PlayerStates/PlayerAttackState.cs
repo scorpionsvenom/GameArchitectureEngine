@@ -8,24 +8,53 @@ namespace GameArchitectureEngine
 {
     public class PlayerAttackState : State
     {
+        private const double attackCooldownTime = 0.75;
+        private double currentTime = 0.0;
+
         public PlayerAttackState()
         {
-            Name = "Attack";
+            Name = "PlayerAttack";
         }
 
         public override void Enter(object owner)
         {
-            throw new NotImplementedException();
+            PlayerGameObject player = owner as PlayerGameObject;
+
+            if (player != null)
+            {
+                player.Speed = 0.0f;
+                currentTime = 0.0;
+            }
         }
 
         public override void Exit(object owner)
         {
-            throw new NotImplementedException();
+            PlayerGameObject player = owner as PlayerGameObject;
+
+            if (player != null)
+            {
+                player.Speed = 0.0f;
+                currentTime = 0.0;
+            }
         }
 
         public override void Execute(object owner, GameTime gameTime)
         {
-            throw new NotImplementedException();
+            PlayerGameObject player = owner as PlayerGameObject;
+
+            if (player == null) return;            
+
+            if (currentTime >= attackCooldownTime)
+            {
+                player.Speed = 0.0f;
+                currentTime = 0.0f;
+                player.Attack();
+            }
+            else
+            {
+                player.Speed = 0.0f;
+                currentTime += gameTime.ElapsedGameTime.TotalSeconds;
+            }
         }
     }
 }

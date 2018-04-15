@@ -22,6 +22,7 @@ namespace GameArchitectureEngine
                 game.gameState = GameState.IntroState;
                 game.InitialiseIntroState();
                 game.LoadIntroScreenContent();
+                game.SpacePressed = false;
             }
         }
 
@@ -31,7 +32,7 @@ namespace GameArchitectureEngine
 
             if (game != null)
             {
-
+                game.UnloadIntroContent();
             }
         }
 

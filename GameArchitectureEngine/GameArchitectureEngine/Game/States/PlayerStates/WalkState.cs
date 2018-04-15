@@ -16,11 +16,15 @@ namespace GameArchitectureEngine
         public override void Enter(object owner)
         {
             PlayerGameObject player = owner as PlayerGameObject;
+
+            if (player != null) player.Speed = player.MaxSpeed;
         }
 
         public override void Exit(object owner)
         {
             PlayerGameObject player = owner as PlayerGameObject;
+
+            if (player != null) player.Speed = player.MaxSpeed;
         }
 
         public override void Execute(object owner, GameTime gameTime)

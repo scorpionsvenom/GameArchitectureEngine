@@ -10,15 +10,17 @@ using Microsoft.Xna.Framework.Media;
 namespace GameArchitectureEngine
 {
     public class PlayerGameObject : GameObjectBase
-    {        
-        public event DamageEnemyHandler DamageEnemy;
-        public event CollisionWithPotionHandler CollideWithPotion;
+    {
+        public event CollisionWithSpecificObjectHandler DamageEnemy;
+        public event CollisionWithSpecificObjectHandler CollideWithPotion;
+        public event CollisionWithSpecificObjectHandler CollideWithEnemy;
 
         FSM fsm;
 
         WalkState walkState;
         PlayerAttackState attackState;
-
+        PlayerDieState dieState;
+        
         private int health;
         public int Health
         {
@@ -60,7 +62,19 @@ namespace GameArchitectureEngine
         }
 
         GameTime gameTime;
-        private float speed = 160.0f;        
+
+        private const float maxSpeed = 160.0f;
+        public float MaxSpeed
+        {
+            get { return maxSpeed; }
+        }
+
+        private float speed = maxSpeed;        
+        public float Speed
+        {
+            get { return speed; }
+            set { speed = value; }
+        }
 
         private Rectangle localBounds;
 
@@ -75,14 +89,41 @@ namespace GameArchitectureEngine
             }
         }
 
+        private bool canAttack = false;
+        public bool CanAttack
+        {
+            get { return canAttack; }
+            set { canAttack = value; }
+        }
+
+        private bool isCloseEnoughToAttack = false;
+
         public PlayerGameObject()
         {
             //TODO: set position from serialised object
-            Position = new Vector2(120f, 200f);
+            Position = new Vector2(480f, 480f);
         }
 
         public override void Initialise()
         {
+            fsm = new FSM(this);
+
+            walkState = new WalkState();
+            attackState = new PlayerAttackState();
+            dieState = new PlayerDieState();
+
+            walkState.AddTransitions(new Transition(attackState, () => (canAttack && isCloseEnoughToAttack)));
+            attackState.AddTransitions(new Transition(walkState, () => isCloseEnoughToAttack));
+
+            walkState.AddTransitions(new Transition(dieState, () => !isAlive));
+            attackState.AddTransitions(new Transition(dieState, () => !isAlive));
+
+            fsm.AddState(walkState);
+            fsm.AddState(attackState);
+            fsm.AddState(dieState);
+
+            fsm.Initialise("Walk");
+
             health = 50;
             maxHealth = 200;
             IsAlive = true;
@@ -90,6 +131,7 @@ namespace GameArchitectureEngine
 
         public override void LoadContent(ResourceManager resources)
         {
+            gameTime = new GameTime();
             //TODO: Keep local copy of resource manager, don't think this is a good approach
             Resources = resources;
 
@@ -152,6 +194,9 @@ namespace GameArchitectureEngine
         {
             if (buttonState == eButtonState.DOWN)
             {
+                if (gameTime == null)
+                    return;
+
                 float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 
                 if (Utilities.IsVectorInsideWindow(mouseLocation, Resources.GraphicsDevice))
@@ -162,7 +207,7 @@ namespace GameArchitectureEngine
                     Vector2 direction = mouseLocation - Position;
                     direction.Normalize();
 
-                    float distance = Vector2.Distance(Position, mouseLocation);
+                    //float distance = Vector2.Distance(Position, mouseLocation);
                     direction = direction * speed * elapsedTime;
 
                     Velocity = direction;
@@ -172,6 +217,14 @@ namespace GameArchitectureEngine
                     //lastMouseLocation = 
                 }
             }
+        }
+
+
+        internal void Die()
+        {
+            speed = 0.0f;
+            sprite.PlayAnimation(death);
+            isAlive = false;
         }
 
         public override bool CollisionTest(Collidable col)
@@ -220,6 +273,12 @@ namespace GameArchitectureEngine
         public void OnCollisionWithPotion(HealthPotionGameObject potion)
         {
             CollideWithPotion?.Invoke(this, potion, new CollisionEventArgs(Position));
+        }
+
+        public void OnCollisionWithEnemy(EnemyGameObject enemy)
+        {
+            if (canAttack)
+                CollideWithEnemy?.Invoke(this, enemy, new CollisionEventArgs(Position));
         }
     }
 }

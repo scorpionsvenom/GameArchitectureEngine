@@ -4,23 +4,37 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace GameArchitectureEngine.Game.States.PlayerStates
+namespace GameArchitectureEngine
 {
     public class PlayerDieState : State
     {
+        public PlayerDieState()
+        {
+            Name = "PlayerDie"; 
+        }
+
         public override void Enter(object owner)
         {
-            throw new NotImplementedException();
+            PlayerGameObject player = owner as PlayerGameObject;
+
+            if (player != null)
+            {
+                player.Speed = 0.0f;
+            }
         }
 
         public override void Exit(object owner)
         {
-            throw new NotImplementedException();
+            PlayerGameObject player = owner as PlayerGameObject;
         }
 
         public override void Execute(object owner, GameTime gameTime)
         {
-            throw new NotImplementedException();
+            PlayerGameObject player = owner as PlayerGameObject;
+
+            if (player == null) return;
+
+            player.Die();
         }
     }
 }

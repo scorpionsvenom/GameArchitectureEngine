@@ -19,6 +19,14 @@ namespace GameArchitectureEngine
     /// </summary>
     public class ActionRPG : Microsoft.Xna.Framework.Game
     {
+        static int nextScreenCalled = 0;
+        static int nextMapCalled = 0;
+
+        private const double eventCoolDownTime = 0.25;
+        private double nextScreenCurrentTime = 0.25;
+        private double nextMapCurrentTime = 0.25;
+        GameTime gameTime;
+
         List<GameObjectBase> characters;
 
         GraphicsDeviceManager graphics;
@@ -36,8 +44,13 @@ namespace GameArchitectureEngine
         MainGameState mainGameState;
         GameOverState gameOverState;
 
-        bool spacePressed = false;
-        
+        private bool spacePressed = false;
+        public bool SpacePressed
+        {
+            get { return spacePressed; } 
+            set { spacePressed = value; }
+        }
+
         public GameState gameState = GameState.IntroState;
 
         List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
@@ -56,7 +69,7 @@ namespace GameArchitectureEngine
         float rotation = 0.0f;
 
         Map currentMap;
-        int currentMapIndex;
+        int currentMapIndex = 0;
         int currentMapWidth;
         int currentMapHeight;
 
@@ -77,7 +90,7 @@ namespace GameArchitectureEngine
         /// </summary>
         protected override void Initialize()
         {
-            graphics.IsFullScreen = true;
+            graphics.IsFullScreen = false;
             graphics.PreferredBackBufferHeight = ScreenHeight;
             graphics.PreferredBackBufferWidth = ScreenWidth;
             graphics.ApplyChanges();
@@ -119,8 +132,6 @@ namespace GameArchitectureEngine
 
         public void InitialiseMainGameState()
         {
-            
-
             characters = new List<GameObjectBase>();
             
             mapManager = new MapManager(); 
@@ -150,8 +161,10 @@ namespace GameArchitectureEngine
             foreach (HealthPotionGameObject potion in potions)
                 potion.HealPlayer += HealPlayerTest;
 
+            mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
             player.DamageEnemy += HurtEnemyTest;
             player.CollideWithPotion += CollideWithPotionTest;
+            player.CollideWithEnemy += CollideWithEnemyTest;
             //TODO Remove testings
 
             InitialiseCollidableObjects();
@@ -165,6 +178,7 @@ namespace GameArchitectureEngine
         {
             Commands = new CommandManager();
             InitialiseBindings();
+           
         }
         #endregion
 
@@ -191,13 +205,16 @@ namespace GameArchitectureEngine
                 Resources = new ResourceManager();
 
             Resources.LoadContent(Content, GraphicsDevice);
+
+            MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);
         }
 
         public void LoadMainGameContent()
         {
+            Resources.LoadContent(Content, GraphicsDevice);
             Player.HealPlayer(50);
             Player.IsAlive = true;
-            Player.Position = new Vector2(120f, 200f);
+            //Player.Position = new Vector2(120f, 200f);
 
             foreach (GameObjectBase gameObject in characters)
             {
@@ -212,20 +229,21 @@ namespace GameArchitectureEngine
             mapManager.LoadContent(Resources);
             LoadMapTypes();
 
-            currentMapIndex = 0;//TODO get current map index
 
-            currentMap = Resources.Maps[string.Format("Maps/{0}",currentMapIndex)];
-
+            if (currentMapIndex < Resources.Maps.Count)
+                currentMap = Resources.Maps[string.Format("Maps/{0}",currentMapIndex)];
+            
             currentMapWidth = currentMap.MapList[0].Length * 64;
             currentMapHeight = currentMap.MapList.Count * 64;
             
             MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);
+            MediaPlayer.Play(Resources.Songs["Sounds/Songs/Transilvanian Hunger-Darkthrone-Transilvanian Hunger"]);
         }
 
         public void LoadGameOverContent()
         {
             Resources.LoadContent(Content, GraphicsDevice);
+            MediaPlayer.Play(Resources.Songs["Sounds/Songs/The Wanderer-Emperor-Anthems to the Welkin at Dusk"]);
         }
         #endregion
 
@@ -237,7 +255,13 @@ namespace GameArchitectureEngine
         protected override void UnloadContent()
         {
             Resources.UnloadContent(Content);
+            MediaPlayer.Stop();
             base.UnloadContent();
+        }
+
+        public void UnloadIntroContent()
+        {
+            MediaPlayer.Stop();
         }
 
         public void UnloadMainGameContent()
@@ -249,7 +273,7 @@ namespace GameArchitectureEngine
             collisionManager = null;
             Commands = null;
             Resources.UnloadContent(Content);
-
+            MediaPlayer.Stop();
             //#region Constrain mouse to window
 
             //if (Mouse.GetState().X < 0)
@@ -269,6 +293,11 @@ namespace GameArchitectureEngine
             //    Mouse.SetPosition(Mouse.GetState().X, ScreenHeight);
 
             //#endregion
+        }
+
+        public void UnloadGameOverContent()
+        {
+            MediaPlayer.Stop();
         }
 
         #endregion
@@ -297,6 +326,8 @@ namespace GameArchitectureEngine
                     UpdateIntro(gameTime);
                     break;
             }
+
+            this.gameTime = gameTime;
 
             base.Update(gameTime);
         }
@@ -396,7 +427,9 @@ namespace GameArchitectureEngine
         private void DrawHUD()
         {
             Rectangle TitleSafeArea = GraphicsDevice.Viewport.TitleSafeArea;
-            Vector2 hudLocation = new Vector2(TitleSafeArea.X, TitleSafeArea.Y);
+
+            Vector2 hudLocation = new Vector2(player.Position.X - GraphicsDevice.Viewport.Width / 2, player.Position.Y - GraphicsDevice.Viewport.Height / 2);
+            Vector2 hudLocation2 = new Vector2(TitleSafeArea.X, TitleSafeArea.Y);
             Vector2 centre = new Vector2(TitleSafeArea.X + TitleSafeArea.Width / 2.0f,
                                          TitleSafeArea.Y + TitleSafeArea.Height / 2.0f);
 
@@ -407,7 +440,6 @@ namespace GameArchitectureEngine
 
             //Passing in the path is acceptible? seems a bit clunky
             DrawShadowedString(Resources.Fonts["Fonts/Hud"], message, hudLocation, messageColour);
-
         }
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color colour)
@@ -420,9 +452,13 @@ namespace GameArchitectureEngine
         {
             Commands.AddKeyboardBindings(Keys.Escape, StopGame);
             Commands.AddKeyboardBindings(Keys.Space, GoToNextScreen);
+            Commands.AddKeyboardBindings(Keys.N, GoToNextMap);
 
             if (gameState == GameState.MainGameState)
+            {
                 Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
+                Commands.AddMouseBinding(MouseButton.LEFT, mousePointer.SelectEnemy);
+            }
         }
 
         public void StopGame(eButtonState buttonState, Vector2 amount)
@@ -431,17 +467,7 @@ namespace GameArchitectureEngine
             {
                 Exit();
             }
-        }
-
-        public void GoToNextScreen(eButtonState buttonState, Vector2 amount)
-        {
-            if (spacePressed) spacePressed = false;
-
-            if (buttonState == eButtonState.DOWN)
-            {
-                spacePressed = true;
-            }
-        }
+        }        
 
         public void InitialiseCollidableObjects()
         {
@@ -479,26 +505,46 @@ namespace GameArchitectureEngine
 
         #region event testing
         //TODO: put these methods into appropriate managing class
-        public void HurtEnemyTest(PlayerGameObject player, EnemyGameObject enemy, EventArgs e)
+        private void HurtEnemyTest(object player, object enemy, EventArgs e)
         {
             
         }
 
-        public void HurtPlayerTest(object sender, EventArgs e)
+        private void HurtPlayerTest(object sender, EventArgs e)
         {            
             player.HurtPlayer(25);
         }
 
         //TODO: wire this up
-        public void HealPlayerTest(object sender, EventArgs e)
+        private void HealPlayerTest(object sender, EventArgs e)
         {
             player.HealPlayer(50);
         }
 
-        private void CollideWithPotionTest(object sender, HealthPotionGameObject potion, CollisionEventArgs e)
+        private void CollideWithPotionTest(object sender, object passedInPotion, CollisionEventArgs e)
         {
-            potion.OnHealPlayer();
+            HealthPotionGameObject potion = passedInPotion as HealthPotionGameObject;
+
+            if (potion != null)
+                potion.OnHealPlayer();
             //throw new NotImplementedException();
+        }
+
+        private void CollideWithEnemyTest(object sender, object passedInEnemy, CollisionEventArgs e)
+        {
+            EnemyGameObject enemy = passedInEnemy as EnemyGameObject;
+
+            if (enemy != null)
+            {
+                player.OnCollisionWithEnemy(enemy);
+            }
+        }
+
+        private void MouseSelectEnemyToAttack(object sender, CollisionEventArgs e)
+        {
+            EnemyGameObject enemy = sender as EnemyGameObject;
+
+            player.CanAttack = true;
         }
         #endregion
 
@@ -530,15 +576,48 @@ namespace GameArchitectureEngine
             mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 320, 128);
         }
 
-        public void ResetScene()
+        private void GoToNextScreen(eButtonState buttonState, Vector2 amount)
         {
-            potions.Clear();
-            enemies.Clear();
+            if (nextScreenCurrentTime >= eventCoolDownTime)
+            {
+                nextScreenCurrentTime = 0.0f;
 
-            potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
-            enemies.Add(new EnemyGameObject(new Vector2(350, 350), player, 15, 100));
-            enemies.Add(new EnemyGameObject(new Vector2(500, 400), player, 100, 100));
-            //Initialize();
+                if (buttonState == eButtonState.DOWN)
+                {
+                    nextScreenCalled++;
+                    spacePressed = true;
+                }
+            }
+            else
+            {
+                nextScreenCurrentTime += gameTime.ElapsedGameTime.TotalSeconds;
+            }
+        }
+
+        private void GoToNextMap(eButtonState buttonState, Vector2 amount)
+        {
+            if (nextMapCurrentTime >= eventCoolDownTime)
+            {
+                if (buttonState == eButtonState.DOWN)
+                {
+                    nextMapCurrentTime = 0.0f;
+
+                    currentMapIndex++;
+
+                    UnloadMainGameContent();
+
+                    InitialiseMainGameState();
+
+                    LoadMainGameContent();
+                    spacePressed = true;
+
+                    nextMapCalled++;
+                }
+            }
+            else
+            {
+                nextMapCurrentTime += gameTime.ElapsedGameTime.TotalSeconds;
+            }            
         }
     }
 }

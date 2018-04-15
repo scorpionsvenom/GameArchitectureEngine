@@ -9,7 +9,7 @@ namespace GameArchitectureEngine
 {
     public class EnemyGameObject : GameObjectBase
     {
-        public event DamagePlayerHandler DamagePlayer;
+        public event CollisionHandler DamagePlayer;
 
         public float ChaseSpeed = 88.0f;
         public float WanderSpeed = 48.0f;

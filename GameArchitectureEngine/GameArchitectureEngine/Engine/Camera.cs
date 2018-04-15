@@ -53,6 +53,13 @@ namespace GameArchitectureEngine
                                                 Matrix.CreateTranslation(new Vector3(viewport.Width / 2, viewport.Height / 2, 0));
         }
 
+        /// <summary>
+        /// This method should lock the camera when the player approaches the boundaries 
+        /// of the map so that the camera stops moving, but the player is still able to move to the boundary
+        /// </summary>
+        /// <param name="mapWidth"></param>
+        /// <param name="mapHeight"></param>
+        /// <returns></returns>
         private Vector3 LockValuesToLevel(int mapWidth, int mapHeight)
         {
             Vector3 lockedCentre = Vector3.Zero;
@@ -63,15 +70,15 @@ namespace GameArchitectureEngine
                 lockedCentre.X = centre.X;
             else if (centre.X - halfVPWidth < 0)
                 lockedCentre.X = halfVPWidth;
-            else if (centre.X + halfVPWidth > mapWidth)
-                lockedCentre.X = mapWidth - halfVPWidth;
+            else if (centre.X + halfVPWidth >= mapWidth)
+                lockedCentre.X = centre.X;
 
             if (centre.Y- halfVPHeight > 0 && centre.Y + halfVPHeight < mapHeight)
                 lockedCentre.Y = centre.Y;
             else if (centre.Y - halfVPHeight < 0)
                 lockedCentre.Y = halfVPHeight;
             else if (centre.Y + halfVPHeight > mapHeight)
-                lockedCentre.Y = mapHeight - halfVPHeight;
+                lockedCentre.Y = centre.Y;
 
             return lockedCentre;
         }        

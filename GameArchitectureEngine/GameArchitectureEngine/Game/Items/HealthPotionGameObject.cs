@@ -9,7 +9,7 @@ namespace GameArchitectureEngine
 {
     public class HealthPotionGameObject : GameObjectBase
     {
-        public event HealPlayerHandler HealPlayer;
+        public event CollisionHandler HealPlayer;
 
         public Collidable Collidable;
         private Animation displayAnimation;
