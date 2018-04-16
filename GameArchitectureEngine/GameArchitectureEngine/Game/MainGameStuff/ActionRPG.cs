@@ -457,7 +457,7 @@ namespace GameArchitectureEngine
             if (gameState == GameState.MainGameState)
             {
                 Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
-                Commands.AddMouseBinding(MouseButton.LEFT, mousePointer.SelectEnemy);
+                //Commands.AddMouseBinding(MouseButton.LEFT, mousePointer.SelectEnemy);
             }
         }
 

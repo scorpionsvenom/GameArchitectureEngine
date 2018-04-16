@@ -45,7 +45,7 @@ namespace GameArchitectureEngine
         {
             centre = new Vector2(position.X, position.Y);
 
-            Vector3 lockedCentre = LockValuesToLevel(mapWidth, mapHeight);
+            Vector3 lockedCentre = new Vector3(centre,0.0f);// LockValuesToLevel(mapWidth, mapHeight);
 
             transform = Matrix.CreateTranslation(new Vector3(-lockedCentre.X, -lockedCentre.Y, 0)) * 
                                                 Matrix.CreateRotationZ(rotation) * 
