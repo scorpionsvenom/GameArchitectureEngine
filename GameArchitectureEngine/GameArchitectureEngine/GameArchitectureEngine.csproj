@@ -104,6 +104,7 @@
     <Compile Include="Game\Items\HealthPotionGameObject.cs" />
     <Compile Include="Game\States\AI States\IdleState.cs" />
     <Compile Include="Game\Characters\PlayerGameObject.cs" />
+    <Compile Include="Game\States\AI States\DieState.cs" />
     <Compile Include="Game\States\GameStates\GameOverState.cs" />
     <Compile Include="Game\States\GameStates\IntroScreenState.cs" />
     <Compile Include="Game\States\GameStates\MainGameState.cs" />

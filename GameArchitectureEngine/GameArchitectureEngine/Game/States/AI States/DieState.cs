@@ -6,11 +6,11 @@ using Microsoft.Xna.Framework;
 
 namespace GameArchitectureEngine
 {
-    public class ChaseState : State
+    public class DieState : State
     {
-        public ChaseState()
+        public DieState()
         {
-            Name = "Chase";
+            Name = "Die"; 
         }
 
         public override void Enter(object owner)
@@ -19,19 +19,14 @@ namespace GameArchitectureEngine
 
             if (enemy != null)
             {
-                enemy.state = EnemyGameObject.EnemyState.Chase;
-                enemy.Speed = EnemyGameObject.ChaseSpeed;
+                enemy.state = EnemyGameObject.EnemyState.Die;
+                enemy.Speed = 0.0f;
             }
         }
 
         public override void Exit(object owner)
         {
             EnemyGameObject enemy = owner as EnemyGameObject;
-
-            if (enemy != null)
-            {
-                enemy.Speed = EnemyGameObject.ChaseSpeed;
-            }
         }
 
         public override void Execute(object owner, GameTime gameTime)
@@ -39,10 +34,10 @@ namespace GameArchitectureEngine
             EnemyGameObject enemy = owner as EnemyGameObject;
 
             if (enemy == null) return;
+            
+            enemy.Die();
 
-            enemy.MoveToward(enemy.Player, gameTime);        
+            enemy.Speed = 0.0f;
         }
-
-        
     }
 }

@@ -11,19 +11,46 @@ namespace GameArchitectureEngine
     {
         public event CollisionHandler DamagePlayer;
 
-        public float ChaseSpeed = 88.0f;
-        public float WanderSpeed = 48.0f;
-        public float FleeSpeed = 96.0f;        
+        public enum EnemyState
+        {
+            Idle = 0,
+            Flee,
+            Chase,
+            Attack,
+            Die,
+        }
+        public EnemyState state = EnemyState.Idle;
+
+
+        public const float ChaseSpeed = 88.0f;
+        public const float WanderSpeed = 48.0f;
+        public const float FleeSpeed = 96.0f;
+
+        private float speed = 64.0f;
+        public float Speed
+        {
+            get { return speed; }
+            set { speed = value; }
+        }
 
         public FSM fsm;
         public IdleState idle;
         public FleeState flee;
         public ChaseState chase;
         public AttackState attack;
+        public DieState die;
 
         GameTime gameTime;
 
         Animation idleAnimation;
+
+        internal void Die()
+        {
+            speed = 0.0f;
+            isAlive = false;
+            canAttack = false;
+        }
+
         Animation attackAnimation;
         Animation dieAnimation;
 
@@ -61,14 +88,7 @@ namespace GameArchitectureEngine
         {
             get { return isAlive; }
         }
-
-        private float speed = 64.0f;
-        public float Speed
-        {
-            get { return speed; }
-            set { speed = value; }
-        }
-
+        
         private Vector2 direction;
         public Vector2 Direction
         {
@@ -140,6 +160,7 @@ namespace GameArchitectureEngine
             flee = new FleeState();
             chase = new ChaseState();
             attack = new AttackState();
+            die = new DieState();
             
             idle.AddTransitions(new Transition(flee, () => (PlayerSeen && isWeak)));
             flee.AddTransitions(new Transition(idle, () => !PlayerSeen));
@@ -156,43 +177,60 @@ namespace GameArchitectureEngine
             chase.AddTransitions(new Transition(attack, () => (CanAttack && !isWeak)));
             attack.AddTransitions(new Transition(chase, () => (!CanAttack && PlayerSeen)));
 
+            idle.AddTransitions(new Transition(die, () => !isAlive));
+            flee.AddTransitions(new Transition(die, () => !isAlive));
+            chase.AddTransitions(new Transition(die, () => !isAlive));
+            attack.AddTransitions(new Transition(die, () => !isAlive));
+
             fsm.AddState(idle);            
             fsm.AddState(flee);
+            fsm.AddState(chase);
+            fsm.AddState(die);
 
             fsm.Initialise("Idle");
 
             idleAnimation = new Animation(resources.SpriteSheets["Sprites/Enemies/EnemyIdle"], 0.5f, true);
             attackAnimation = new Animation(resources.SpriteSheets["Sprites/Enemies/Attack"], 0.25f, true);
-
-            sprite.PlayAnimation(idleAnimation);
+            dieAnimation = new Animation(resources.SpriteSheets["Sprites/Enemies/EnemyDie"], 0.5f, false);
 
             int width = (int)(idleAnimation.FrameWidth * 0.4f);
             int left = (idleAnimation.FrameWidth - width) / 2;
             int height = (int)(idleAnimation.FrameHeight * 0.8);
             int top = idleAnimation.FrameHeight - height;
             localBounds = new Rectangle(left, top, width, height);
-                        
-            
 
             attackRangeRectangle = new Rectangle((int)Position.X - (attackAnimation.FrameWidth / 2), (int)Position.Y - attackAnimation.FrameHeight, attackAnimation.FrameWidth, attackAnimation.FrameHeight);
         }
 
         public override void Update(GameTime gameTime)
         {
-            this.gameTime = gameTime;
+            isAlive = (health > 0);
 
-            isWeak = (Health < MaxHealth / 2);
-            playerSeen = (Vector2.Distance(Position, player.Position) < SightRange);
+            if (isAlive)
+            {
+                sprite.PlayAnimation(idleAnimation);
+
+                this.gameTime = gameTime;
+
+                isWeak = (Health < MaxHealth / 2);
+                playerSeen = (Vector2.Distance(Position, player.Position) < SightRange);
+
+                attackRangeRectangle = new Rectangle((int)Position.X - (attackAnimation.FrameWidth / 2), (int)Position.Y - attackAnimation.FrameHeight, attackAnimation.FrameWidth, attackAnimation.FrameHeight);
+
+                canAttack = (attackRangeRectangle.Intersects(player.BoundingBox));
+
+                Position += Velocity;
+
+                BoundingBox = new Rectangle((int)Position.X - idleAnimation.FrameWidth / 2, (int)Position.Y - idleAnimation.FrameWidth / 2, idleAnimation.FrameWidth, idleAnimation.FrameWidth);
+            }
+            else
+            {
+                sprite.PlayAnimation(dieAnimation);
+                speed = 0;
+                Velocity = Vector2.Zero;
+            }
 
             fsm.Update(gameTime);
-
-            attackRangeRectangle = new Rectangle((int)Position.X - (attackAnimation.FrameWidth / 2), (int)Position.Y - attackAnimation.FrameHeight, attackAnimation.FrameWidth, attackAnimation.FrameHeight);
-
-            canAttack = (attackRangeRectangle.Intersects(player.BoundingBox));
-
-            Position += Velocity;
-
-            BoundingBox = new Rectangle((int)Position.X - idleAnimation.FrameWidth / 2, (int)Position.Y - idleAnimation.FrameWidth / 2, idleAnimation.FrameWidth, idleAnimation.FrameWidth); 
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch sprBatch)
@@ -265,7 +303,7 @@ namespace GameArchitectureEngine
         {
             EnemyGameObject enemy = col as EnemyGameObject;
 
-            if (enemy != null)
+            if (enemy != null && isAlive)
             {
                 Point enemyCentre = enemy.BoundingBox.Center;
                 Point centre = BoundingBox.Center;

@@ -8,6 +8,9 @@ namespace GameArchitectureEngine
 {
     public class PlayerDieState : State
     {
+        private const double dyingTime = 1.0;
+        private double currentTime = 0.0;
+
         public PlayerDieState()
         {
             Name = "PlayerDie"; 
@@ -19,13 +22,16 @@ namespace GameArchitectureEngine
 
             if (player != null)
             {
+                player.state = PlayerGameObject.PlayerState.Die;
                 player.Speed = 0.0f;
+                currentTime = 0.0;
             }
         }
 
         public override void Exit(object owner)
         {
             PlayerGameObject player = owner as PlayerGameObject;
+            currentTime = 0.0;
         }
 
         public override void Execute(object owner, GameTime gameTime)
@@ -34,7 +40,15 @@ namespace GameArchitectureEngine
 
             if (player == null) return;
 
-            player.Die();
+            if (currentTime >= dyingTime)
+            {
+                player.Die();
+                currentTime = 0.0;
+            }
+            else
+            {
+                currentTime += gameTime.ElapsedGameTime.TotalSeconds;
+            }
         }
     }
 }

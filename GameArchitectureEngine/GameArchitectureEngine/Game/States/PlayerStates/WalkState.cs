@@ -17,7 +17,11 @@ namespace GameArchitectureEngine
         {
             PlayerGameObject player = owner as PlayerGameObject;
 
-            if (player != null) player.Speed = player.MaxSpeed;
+            if (player != null)
+            {
+                player.state = PlayerGameObject.PlayerState.Walk;
+                player.Speed = player.MaxSpeed;
+            }
         }
 
         public override void Exit(object owner)

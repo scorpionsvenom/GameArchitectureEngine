@@ -23,6 +23,8 @@ namespace GameArchitectureEngine
         public event EventHandler<KeyboardEventArgs> OnKeyUp = delegate { };
 
         public event EventHandler<MouseEventArgs> OnMouseButtonDown = delegate { };
+        public event EventHandler<MouseEventArgs> OnMouseButtonUp = delegate { };
+        public event EventHandler<MouseEventArgs> OnMouseButtonPressed = delegate { };
 
         public InputListener()
         {
@@ -92,6 +94,60 @@ namespace GameArchitectureEngine
                     {
                         if (OnMouseButtonDown != null)
                             OnMouseButtonDown(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+
+                    if (PrevMouseState.LeftButton == ButtonState.Pressed && CurrentMouseState.LeftButton == ButtonState.Released)
+                    {
+                        if (OnMouseButtonUp != null)
+                            OnMouseButtonUp(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+
+                    if (PrevMouseState.LeftButton == ButtonState.Released && CurrentMouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        if (OnMouseButtonPressed != null)
+                            OnMouseButtonPressed(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+                }
+
+                if (button == MouseButton.MIDDLE)
+                {
+                    if (CurrentMouseState.MiddleButton == ButtonState.Pressed)
+                    {
+                        if (OnMouseButtonDown != null)
+                            OnMouseButtonDown(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+
+                    if (PrevMouseState.MiddleButton == ButtonState.Pressed && CurrentMouseState.MiddleButton == ButtonState.Released)
+                    {
+                        if (OnMouseButtonUp != null)
+                            OnMouseButtonUp(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+
+                    if (PrevMouseState.MiddleButton == ButtonState.Released && CurrentMouseState.MiddleButton == ButtonState.Pressed)
+                    {
+                        if (OnMouseButtonPressed != null)
+                            OnMouseButtonPressed(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+                }
+
+                if (button == MouseButton.RIGHT)
+                {
+                    if (CurrentMouseState.RightButton == ButtonState.Pressed)
+                    {
+                        if (OnMouseButtonDown != null)
+                            OnMouseButtonDown(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+
+                    if (PrevMouseState.RightButton == ButtonState.Pressed && CurrentMouseState.RightButton == ButtonState.Released)
+                    {
+                        if (OnMouseButtonUp != null)
+                            OnMouseButtonUp(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
+                    }
+
+                    if (PrevMouseState.RightButton == ButtonState.Released && CurrentMouseState.RightButton == ButtonState.Pressed)
+                    {
+                        if (OnMouseButtonPressed != null)
+                            OnMouseButtonPressed(this, new MouseEventArgs(button, CurrentMouseState, PrevMouseState));
                     }
                 }
             }           

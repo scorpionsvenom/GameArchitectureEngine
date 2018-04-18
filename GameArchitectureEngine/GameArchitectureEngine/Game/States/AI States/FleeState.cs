@@ -16,13 +16,18 @@ namespace GameArchitectureEngine
         public override void Enter(object owner)
         {
             EnemyGameObject enemy = owner as EnemyGameObject;
-            if (enemy != null) enemy.Speed = enemy.FleeSpeed;
+
+            if (enemy != null)
+            {
+                enemy.state = EnemyGameObject.EnemyState.Flee;
+                enemy.Speed = EnemyGameObject.FleeSpeed;
+            }
         }
 
         public override void Exit(object owner)
         {
             EnemyGameObject enemy = owner as EnemyGameObject;
-            if (enemy != null) enemy.Speed = enemy.FleeSpeed;
+            if (enemy != null) enemy.Speed = EnemyGameObject.FleeSpeed;
         }
 
         public override void Execute(object owner, GameTime gameTime)

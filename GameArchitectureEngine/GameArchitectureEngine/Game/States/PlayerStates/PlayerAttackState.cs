@@ -22,7 +22,8 @@ namespace GameArchitectureEngine
 
             if (player != null)
             {
-                player.Speed = 0.0f;
+                //player.Speed = 0;
+                player.state = PlayerGameObject.PlayerState.Attack;
                 currentTime = 0.0;
             }
         }
@@ -33,7 +34,6 @@ namespace GameArchitectureEngine
 
             if (player != null)
             {
-                player.Speed = 0.0f;
                 currentTime = 0.0;
             }
         }
@@ -46,13 +46,12 @@ namespace GameArchitectureEngine
 
             if (currentTime >= attackCooldownTime)
             {
-                player.Speed = 0.0f;
-                currentTime = 0.0f;
+                //player.MoveTowardEntity(player.target, gameTime);
                 player.Attack();
+                currentTime = 0.0f;
             }
             else
             {
-                player.Speed = 0.0f;
                 currentTime += gameTime.ElapsedGameTime.TotalSeconds;
             }
         }

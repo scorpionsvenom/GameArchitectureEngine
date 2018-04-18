@@ -7,8 +7,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GameArchitectureEngine
 {
-    public delegate void GameAction(eButtonState buttonState, Vector2 amount);
-
     public class CommandManager
     {
         public InputListener m_Input;
@@ -25,6 +23,8 @@ namespace GameArchitectureEngine
             m_Input.OnKeyUp += this.OnKeyUp;
 
             m_Input.OnMouseButtonDown += this.OnMouseButtonDown;
+            m_Input.OnMouseButtonUp += this.OnMouseButtonUp;
+            m_Input.OnMouseButtonPressed += this.OnMouseButtonPressed;
         }
 
         public void Update()
@@ -72,11 +72,32 @@ namespace GameArchitectureEngine
             }
         }
 
+        public void OnMouseButtonUp(object sender, MouseEventArgs e)
+        {
+            GameAction action = m_MouseButtonBindings[e.Button];
+
+            if (action != null)
+            {
+                action(eButtonState.UP, new Vector2(Mouse.GetState().X, Mouse.GetState().Y));
+            }
+        }
+
+        public void OnMouseButtonPressed(object sender, MouseEventArgs e)
+        {
+            GameAction action = m_MouseButtonBindings[e.Button];
+
+            if (action != null)
+            {
+                action(eButtonState.PRESSED, new Vector2(Mouse.GetState().X, Mouse.GetState().Y));
+            }
+        }
+
         public void AddKeyboardBindings(Keys key, GameAction action)
         {
             m_Input.AddKey(key);
 
-            m_KeyBindings.Add(key, action);
+            if(!m_KeyBindings.ContainsKey(key))
+                m_KeyBindings.Add(key, action);
         }
 
         public void AddMouseBinding(MouseButton button, GameAction action)

@@ -147,13 +147,13 @@ namespace GameArchitectureEngine
             
             Commands = new CommandManager();   
             
-            mousePointer = new MousePointer(Commands);
+            mousePointer = new MousePointer(Commands, player);
 
             //mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
             player.DamageEnemy += HurtEnemyTest;
             player.CollideWithPotion += CollideWithPotionTest;
             player.CollideWithEnemy += CollideWithEnemyTest;
-            mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
+            mousePointer.SelectEnemy += mousePointer.MouseSelectEntity;
             //TODO Remove testings
 
             InitialiseBindings();
@@ -235,6 +235,8 @@ namespace GameArchitectureEngine
 
             foreach (HealthPotionGameObject potion in potions)
                 potion.HealPlayer += HealPlayerTest;
+
+            player.DamageEnemy += player.Damage;
 
             mapManager.LoadContent(Resources);
             LoadMapTypes();
@@ -494,14 +496,13 @@ namespace GameArchitectureEngine
 
             if (gameState == GameState.MainGameState)
             {
-                Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
-                //Commands.AddMouseBinding(MouseButton.LEFT, mousePointer.OnCollisionWithEnemy);
+                Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowardUnoccupiedMapArea);                
             }
         }
 
         public void StopGame(eButtonState buttonState, Vector2 amount)
         {
-            if (buttonState == eButtonState.DOWN)
+            if (buttonState == eButtonState.PRESSED)
             {
                 Exit();
             }
@@ -546,14 +547,17 @@ namespace GameArchitectureEngine
 
         #region event testing
         //TODO: put these methods into appropriate managing class
-        private void HurtEnemyTest(object player, object enemy, EventArgs e)
+        private void HurtEnemyTest(object attacker, object receiver, EventArgs e)
         {
-            
+            PlayerGameObject player = attacker as PlayerGameObject;
+
+            //if (player != null)
+                //player.Damage(player, receiver, );
         }
 
         private void HurtPlayerTest(object sender, EventArgs e)
         {            
-            player.HurtPlayer(25);
+            player.HurtPlayer(1);
         }
 
         //TODO: wire this up
@@ -580,11 +584,7 @@ namespace GameArchitectureEngine
             }
         }
 
-        private void MouseSelectEnemyToAttack(object sender, CollisionEventArgs e)
-        {
-            EnemyGameObject enemy = sender as EnemyGameObject;
-            player.CanAttack = true;
-        }
+        
         #endregion
 
 
@@ -635,9 +635,7 @@ namespace GameArchitectureEngine
 
         private void GoToNextMap(eButtonState buttonState, Vector2 amount)
         {
-            if (nextMapCurrentTime >= eventCoolDownTime)
-            {
-                if (buttonState == eButtonState.DOWN)
+                if (buttonState == eButtonState.PRESSED)
                 {
                     nextMapCurrentTime = 0.0f;
 
@@ -651,31 +649,30 @@ namespace GameArchitectureEngine
                     spacePressed = true;
 
                     nextMapCalled++;
-                }
-            }
-            else
-            {
-                nextMapCurrentTime += gameTime.ElapsedGameTime.TotalSeconds;
-            }            
+            }         
         }
 
         public void SaveGame(eButtonState buttonState, Vector2 amount)
         {
-            GameInfo.Instance.PlayerInfo.Position = player.Position;
-            GameInfo.Instance.PlayerInfo.Health = player.Health;
 
-            for (int i = 0; i < enemies.Count; i++)
+            if (buttonState == eButtonState.PRESSED)
             {
-                GameInfo.Instance.EnemyInfoArray[i].Position = enemies[i].Position;
-                GameInfo.Instance.EnemyInfoArray[i].Health = enemies[i].Health;
-            }
+                GameInfo.Instance.PlayerInfo.Position = player.Position;
+                GameInfo.Instance.PlayerInfo.Health = player.Health;
 
-            for (int i = 0; i < potions.Count; i++)
-            {
-                GameInfo.Instance.HealthPotionInfoArray[i].Position = potions[i].Position;
-            }
+                for (int i = 0; i < enemies.Count; i++)
+                {
+                    GameInfo.Instance.EnemyInfoArray[i].Position = enemies[i].Position;
+                    GameInfo.Instance.EnemyInfoArray[i].Health = enemies[i].Health;
+                }
 
-            Resources.WriteSaveFile(@"save.xml");
+                for (int i = 0; i < potions.Count; i++)
+                {
+                    GameInfo.Instance.HealthPotionInfoArray[i].Position = potions[i].Position;
+                }
+
+                Resources.WriteSaveFile(@"save.xml");
+            }
         }        
     }
 }

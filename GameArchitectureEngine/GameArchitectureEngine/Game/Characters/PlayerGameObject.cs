@@ -18,14 +18,31 @@ namespace GameArchitectureEngine
         FSM fsm;
 
         WalkState walkState;
+        PlayerChaseState chaseState;
         PlayerAttackState attackState;
         PlayerDieState dieState;
         
+        public enum PlayerState
+        {
+            Walk = 0,
+            Chase,
+            Attack,
+            Die,
+        }
+        public PlayerState state = PlayerState.Walk;
+
         private int health;
         public int Health
         {
             get { return health; }
             set { health = value; }
+        }
+
+        private int attackPower = 25;
+        public int AttackPower
+        {
+            get { return attackPower; }
+            set { attackPower = value; }
         }
 
         private int maxHealth;
@@ -45,12 +62,19 @@ namespace GameArchitectureEngine
         private AnimationPlayer sprite;
 
         private SpriteEffects flip = SpriteEffects.None;
-
+        
         private bool isAlive = true;
         public bool IsAlive
         {
             get { return isAlive; }
             set { isAlive = value; }
+        }
+
+        private bool isDying = false;
+        public bool IsDying
+        {
+            get { return isDying; }
+            set { isDying = value; }
         }
 
         private Vector2 lastMouseLocation = Vector2.Zero;
@@ -99,6 +123,9 @@ namespace GameArchitectureEngine
 
         private bool isCloseEnoughToAttack = false;
 
+        public EnemyGameObject target = null;
+        private Vector2 targetPosition;
+
         public PlayerGameObject()
         {
             //TODO: set position from serialised object
@@ -110,16 +137,22 @@ namespace GameArchitectureEngine
             fsm = new FSM(this);
 
             walkState = new WalkState();
+            chaseState = new PlayerChaseState();
             attackState = new PlayerAttackState();
             dieState = new PlayerDieState();
+                        
+            walkState.AddTransitions(new Transition(chaseState, () => canAttack));
+            chaseState.AddTransitions(new Transition(attackState, () => isCloseEnoughToAttack));
 
-            walkState.AddTransitions(new Transition(attackState, () => (canAttack && isCloseEnoughToAttack)));
-            attackState.AddTransitions(new Transition(walkState, () => isCloseEnoughToAttack));
+            attackState.AddTransitions(new Transition(walkState, () => !canAttack));
+            attackState.AddTransitions(new Transition(chaseState, () => (canAttack && !isCloseEnoughToAttack)));
 
-            walkState.AddTransitions(new Transition(dieState, () => !isAlive));
-            attackState.AddTransitions(new Transition(dieState, () => !isAlive));
+            walkState.AddTransitions(new Transition(dieState, () => isDying));
+            chaseState.AddTransitions(new Transition(dieState, () => isDying));
+            attackState.AddTransitions(new Transition(dieState, () => isDying));
 
             fsm.AddState(walkState);
+            fsm.AddState(chaseState);
             fsm.AddState(attackState);
             fsm.AddState(dieState);
 
@@ -162,11 +195,20 @@ namespace GameArchitectureEngine
         {
             this.gameTime = gameTime;
 
-            isAlive = !(health <= 0);
+            isDying = (health <= 0);
 
-            if (isAlive)
+            if (target != null) targetPosition = target.Position;
+
+            if (!isDying)
             {
-                sprite.PlayAnimation(walkAnimation);
+                if (state == PlayerState.Attack)
+                {
+                    sprite.PlayAnimation(attackAnimation);
+                }
+                else if (state == PlayerState.Walk || state == PlayerState.Chase)
+                {
+                    sprite.PlayAnimation(walkAnimation);
+                }
 
                 if (Vector2.Distance(lastMouseLocation, Position) < stoppingDistance)
                     velocity = Vector2.Zero;
@@ -179,6 +221,8 @@ namespace GameArchitectureEngine
             {
                 sprite.PlayAnimation(death);
             }
+
+            fsm.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -191,7 +235,7 @@ namespace GameArchitectureEngine
             sprite.Draw(gameTime, spriteBatch, Position, flip);
         }
         
-        public void MoveTowards(eButtonState buttonState, Vector2 mouseLocation)
+        public void MoveTowardUnoccupiedMapArea(eButtonState buttonState, Vector2 mouseLocation)
         {
             if (buttonState == eButtonState.DOWN)
             {
@@ -212,6 +256,8 @@ namespace GameArchitectureEngine
                     direction = direction * speed * elapsedTime;
 
                     Velocity = direction;
+
+                    canAttack = isCloseEnoughToAttack = false;
                 }
                 else
                 {
@@ -220,11 +266,19 @@ namespace GameArchitectureEngine
             }
         }
 
+        public void MoveTowardEntity(GameObjectBase obj, GameTime gameTime)
+        {
+            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector2 directionToChase = obj.Position - Position;
+
+            directionToChase.Normalize();
+            Velocity = directionToChase * speed * elapsedTime;
+        }
 
         internal void Die()
         {
             speed = 0.0f;
-            sprite.PlayAnimation(death);
             isAlive = false;
         }
 
@@ -232,7 +286,7 @@ namespace GameArchitectureEngine
         {
             if (col != null)
             {
-                OnCollision(col);
+                //OnCollision(col);
                 return BoundingBox.Intersects(col.BoundingBox);
             }
 
@@ -243,9 +297,9 @@ namespace GameArchitectureEngine
         {
             EnemyGameObject enemy = col as EnemyGameObject;
 
-            if (enemy != null)
-            {
-
+            if (enemy != null && enemy == target)
+            {                
+                isCloseEnoughToAttack = true;
             }
         }
 
@@ -259,11 +313,26 @@ namespace GameArchitectureEngine
             health = Math.Max(0, health - amount);
         }
 
+        public void Damage(object sender, object other, CollisionEventArgs e)//(object receiver, int amount)
+        {
+            EnemyGameObject enemy = other as EnemyGameObject;
+
+            if (enemy != null)
+                enemy.Health -= attackPower;
+        }
+
         public void Attack()
         {
             sprite.PlayAnimation(attackAnimation);
-            Velocity = Vector2.Zero;
-            //OnDamageEnemy();
+
+            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector2 directionToChase = target.Position - Position;
+
+            directionToChase.Normalize();
+            Velocity = directionToChase * speed / 4 * elapsedTime;
+
+            OnDamageEnemy(target);
         }
 
         public void OnDamageEnemy(EnemyGameObject enemy)

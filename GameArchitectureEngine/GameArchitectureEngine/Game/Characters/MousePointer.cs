@@ -24,11 +24,13 @@ namespace GameArchitectureEngine
         private int rectDimensions = 10;
         private bool mouseClicked;
 
-        public MousePointer(CommandManager commandManager)
+        public PlayerGameObject player { get; private set; }
+
+        public MousePointer(CommandManager commandManager, PlayerGameObject player)
         {
             this.commandManager = commandManager;
-            this.mapWidth = mapWidth;
-            this.mapHeight = mapHeight;
+
+            this.player = player;
 
             //commandManager.m_Input.OnKeyPressed += MousePressed;
         }
@@ -78,7 +80,6 @@ namespace GameArchitectureEngine
                 EnemyGameObject enemy = col as EnemyGameObject;
                 if (enemy != null)
                 {
-                    OnCollisionWithEnemy(enemy);
                     return BoundingBox.Intersects(col.BoundingBox);
                 }
 
@@ -97,7 +98,7 @@ namespace GameArchitectureEngine
         {
             EnemyGameObject enemy = col as EnemyGameObject;
 
-            if (enemy != null && mouseClicked)
+            if (enemy != null)
             {
                 OnCollisionWithEnemy(col as EnemyGameObject);
             }
@@ -105,12 +106,43 @@ namespace GameArchitectureEngine
 
         public void OnCollisionWithEnemy(EnemyGameObject enemy)
         {
-            MouseState state = Mouse.GetState();
+            MouseState state = Mouse.GetState();            
 
-            if (state.LeftButton == ButtonState.Pressed)
+            if (enemy != null && state.LeftButton == ButtonState.Pressed)
             {
                 SelectEnemy?.Invoke((object)enemy, new CollisionEventArgs(enemy.Position));
             }
-        }        
+        }
+
+        public void MouseSelectEntity(object sender, CollisionEventArgs e)
+        {
+            EnemyGameObject enemy = sender as EnemyGameObject;
+
+            if (enemy != null)
+            {
+                player.CanAttack = true;
+                player.target = enemy;
+            }           
+
+            HealthPotionGameObject potion = sender as HealthPotionGameObject;
+
+            //MouseState state = Mouse.GetState();
+
+            if (potion != null)
+            {
+                //TODO: move player towards selected item
+                //player.MoveTowards(state, new Vector2(state.X, state.Y));
+            }
+        }
+
+        //public void 
+
+        public void OnSelectEnemy(eButtonState buttonState, Vector2 mouseLocation)
+        {
+            if (buttonState == eButtonState.PRESSED)
+            {
+                               
+            }
+        }
     }
 }

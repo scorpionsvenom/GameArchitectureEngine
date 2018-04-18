@@ -17,6 +17,7 @@ namespace GameArchitectureEngine
 
             if (enemy != null)
             {
+                enemy.state = EnemyGameObject.EnemyState.Attack;
                 enemy.Speed = 0.0f;
                 currentTime = 0.0;
             }
@@ -42,8 +43,8 @@ namespace GameArchitectureEngine
             if (currentTime >= attackCooldownTime)
             {
                 enemy.Speed = 0.0f;
-                currentTime = 0.0f;
                 enemy.Attack();
+                currentTime = 0.0f;
             }
             else
             {

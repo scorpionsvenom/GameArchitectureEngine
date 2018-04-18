@@ -15,31 +15,31 @@ namespace GameArchitectureEngine
 
         public override void Enter(object owner)
         {
-            EnemyGameObject enemy = owner as EnemyGameObject;
+            PlayerGameObject player = owner as PlayerGameObject;
 
-            if (enemy != null)
+            if (player != null)
             {
-                enemy.Speed = enemy.ChaseSpeed;
+                player.state = PlayerGameObject.PlayerState.Chase;
             }
         }
 
         public override void Exit(object owner)
         {
-            EnemyGameObject enemy = owner as EnemyGameObject;
+            PlayerGameObject player = owner as PlayerGameObject;
 
-            if (enemy != null)
+            if (player != null)
             {
-                enemy.Speed = enemy.ChaseSpeed;
             }
         }
 
         public override void Execute(object owner, GameTime gameTime)
         {
-            EnemyGameObject enemy = owner as EnemyGameObject;
+            PlayerGameObject player = owner as PlayerGameObject;
 
-            if (enemy == null) return;
-
-            enemy.MoveToward(enemy.Player, gameTime);        
+            if (player != null)
+            {
+                player.MoveTowardEntity(player.target, gameTime);
+            }
         }
 
         

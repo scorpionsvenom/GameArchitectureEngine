@@ -21,7 +21,11 @@ namespace GameArchitectureEngine
             //Define enemy and behaviour initialisation
             EnemyGameObject enemy = owner as EnemyGameObject;
 
-            if (enemy != null) enemy.Speed = enemy.WanderSpeed;
+            if (enemy != null)
+            {
+                enemy.state = EnemyGameObject.EnemyState.Idle;
+                enemy.Speed = EnemyGameObject.WanderSpeed;
+            }
 
             currentTime = 0.0;
         }
@@ -30,7 +34,7 @@ namespace GameArchitectureEngine
         {
             EnemyGameObject enemy = owner as EnemyGameObject;
 
-            if (enemy != null) enemy.Speed = enemy.WanderSpeed;
+            if (enemy != null) enemy.Speed = EnemyGameObject.WanderSpeed;
 
             currentTime = 0.0f;
         }
