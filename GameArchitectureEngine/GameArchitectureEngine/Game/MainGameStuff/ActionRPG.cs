@@ -125,6 +125,11 @@ namespace GameArchitectureEngine
 
         public void InitialiseIntroState()
         {
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferHeight = ScreenHeight;
+            graphics.PreferredBackBufferWidth = ScreenWidth;
+            graphics.ApplyChanges();
+
             Commands = new CommandManager();
 
             InitialiseBindings();
@@ -138,44 +143,31 @@ namespace GameArchitectureEngine
             collisionManager = new CollisionManager();
 
             player = new PlayerGameObject();
-            player.Initialise();
-            characters.Add(player);
+            player.Initialise();            
+            
+            Commands = new CommandManager();   
+            
+            mousePointer = new MousePointer(Commands);
 
-            mousePointer = new MousePointer();
-            characters.Add(mousePointer);
-
-            //TODO: this should be added to the list from a file
-            potions.Add(new HealthPotionGameObject(new Vector2(250, 200)));//TODO: set this position from the map
-            enemies.Add(new EnemyGameObject(new Vector2(350, 350), player, 15, 100));
-            enemies.Add(new EnemyGameObject(new Vector2(500, 400), player, 100, 100));
-
-            foreach (EnemyGameObject enemy in enemies)
-            {
-                characters.Add(enemy);
-            }
-
-            //TODO: manage Testings
-            foreach (EnemyGameObject enemy in enemies)
-                enemy.DamagePlayer += HurtPlayerTest;
-
-            foreach (HealthPotionGameObject potion in potions)
-                potion.HealPlayer += HealPlayerTest;
-
-            mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
+            //mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
             player.DamageEnemy += HurtEnemyTest;
             player.CollideWithPotion += CollideWithPotionTest;
             player.CollideWithEnemy += CollideWithEnemyTest;
+            mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
             //TODO Remove testings
 
-            InitialiseCollidableObjects();
-
-            Commands = new CommandManager();            
-
             InitialiseBindings();
+
+            
         }
 
         public void InitialiseGameOverState()
         {
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferHeight = ScreenHeight;
+            graphics.PreferredBackBufferWidth = ScreenWidth;
+            graphics.ApplyChanges();
+
             Commands = new CommandManager();
             InitialiseBindings();
            
@@ -212,9 +204,57 @@ namespace GameArchitectureEngine
         public void LoadMainGameContent()
         {
             Resources.LoadContent(Content, GraphicsDevice);
-            Player.HealPlayer(50);
+
+            Resources.ReadSaveFile(@"save.xml");
+
+            Player.Position = GameInfo.Instance.PlayerInfo.Position;
+            Player.Health = GameInfo.Instance.PlayerInfo.Health;
+
+            for (int i = 0; i < GameInfo.Instance.EnemyInfoArray.Count; i++)
+                enemies.Add(new EnemyGameObject(GameInfo.Instance.EnemyInfoArray[i].Position, player, GameInfo.Instance.EnemyInfoArray[i].Health, 100));
+
+            for (int i = 0; i < GameInfo.Instance.HealthPotionInfoArray.Count; i++)
+                potions.Add(new HealthPotionGameObject(GameInfo.Instance.HealthPotionInfoArray[i].Position));                        
+            
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                enemies[i].Position = GameInfo.Instance.EnemyInfoArray[i].Position;
+                enemies[i].Health = GameInfo.Instance.EnemyInfoArray[i].Health;
+            }
+
+            for (int i = 0; i < potions.Count; i++)
+            {
+                potions[i].Position = GameInfo.Instance.HealthPotionInfoArray[i].Position;
+            }
+
             Player.IsAlive = true;
-            //Player.Position = new Vector2(120f, 200f);
+            
+            //TODO: manage Testings
+            foreach (EnemyGameObject enemy in enemies)
+                enemy.DamagePlayer += HurtPlayerTest;
+
+            foreach (HealthPotionGameObject potion in potions)
+                potion.HealPlayer += HealPlayerTest;
+
+            mapManager.LoadContent(Resources);
+            LoadMapTypes();
+            
+            if (currentMapIndex < Resources.Maps.Count)
+                currentMap = Resources.Maps[string.Format("Maps/{0}", currentMapIndex)];
+
+            currentMapWidth = currentMap.MapList[0].Length * 64;
+            currentMapHeight = currentMap.MapList.Count * 64;
+
+            //Needs to be iniitialised here as it requires the map dimensions
+            //mousePointer = new MousePointer(Commands, currentMapWidth, currentMapHeight);
+
+            InitialiseCollidableObjects();
+
+            characters.Add(player);
+            characters.Add(mousePointer);
+
+            foreach (EnemyGameObject enemy in enemies)
+                characters.Add(enemy);
 
             foreach (GameObjectBase gameObject in characters)
             {
@@ -226,16 +266,11 @@ namespace GameArchitectureEngine
                 potion.LoadContent(Resources);
             }
 
-            mapManager.LoadContent(Resources);
-            LoadMapTypes();
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferHeight = currentMapHeight;
+            graphics.PreferredBackBufferWidth = currentMapWidth;
+            graphics.ApplyChanges();
 
-
-            if (currentMapIndex < Resources.Maps.Count)
-                currentMap = Resources.Maps[string.Format("Maps/{0}",currentMapIndex)];
-            
-            currentMapWidth = currentMap.MapList[0].Length * 64;
-            currentMapHeight = currentMap.MapList.Count * 64;
-            
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(Resources.Songs["Sounds/Songs/Transilvanian Hunger-Darkthrone-Transilvanian Hunger"]);
         }
@@ -339,8 +374,7 @@ namespace GameArchitectureEngine
 
         private void UpdateMainGame(GameTime gameTime)
         {
-            ResolveRemovals();
-            collisionManager.Update();
+            
 
             //want to update everything except potions
             foreach (GameObjectBase gameObject in characters)
@@ -349,6 +383,9 @@ namespace GameArchitectureEngine
             }
                         
             camera.Update(Player.Position, rotation, zoom, currentMapWidth, currentMapHeight);
+
+            ResolveRemovals();
+            collisionManager.Update();
         }
 
         private void UpdateGameOver(GameTime gameTime)
@@ -392,9 +429,9 @@ namespace GameArchitectureEngine
 
         public void DrawMainGame(GameTime gameTime)
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
+            spriteBatch.Begin();//SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
             {
-                mapManager.Draw(currentMap, Resources.TileSheets[@"TileSheet/0"], spriteBatch);                
+                mapManager.Draw(currentMap, Resources.TileSheets[@"TileSheet/0"], spriteBatch);
 
                 foreach(EnemyGameObject enemy in enemies)
                 {
@@ -428,8 +465,8 @@ namespace GameArchitectureEngine
         {
             Rectangle TitleSafeArea = GraphicsDevice.Viewport.TitleSafeArea;
 
-            Vector2 hudLocation = new Vector2(player.Position.X - GraphicsDevice.Viewport.Width / 2, player.Position.Y - GraphicsDevice.Viewport.Height / 2);
-            Vector2 hudLocation2 = new Vector2(TitleSafeArea.X, TitleSafeArea.Y);
+            //Vector2 hudLocation = new Vector2(player.Position.X - GraphicsDevice.Viewport.Width / 2, player.Position.Y - GraphicsDevice.Viewport.Height / 2);
+            Vector2 hudLocation = new Vector2(TitleSafeArea.X, TitleSafeArea.Y);
             Vector2 centre = new Vector2(TitleSafeArea.X + TitleSafeArea.Width / 2.0f,
                                          TitleSafeArea.Y + TitleSafeArea.Height / 2.0f);
 
@@ -453,11 +490,12 @@ namespace GameArchitectureEngine
             Commands.AddKeyboardBindings(Keys.Escape, StopGame);
             Commands.AddKeyboardBindings(Keys.Space, GoToNextScreen);
             Commands.AddKeyboardBindings(Keys.N, GoToNextMap);
+            Commands.AddKeyboardBindings(Keys.S, SaveGame);
 
             if (gameState == GameState.MainGameState)
             {
                 Commands.AddMouseBinding(MouseButton.LEFT, player.MoveTowards);
-                //Commands.AddMouseBinding(MouseButton.LEFT, mousePointer.SelectEnemy);
+                //Commands.AddMouseBinding(MouseButton.LEFT, mousePointer.OnCollisionWithEnemy);
             }
         }
 
@@ -472,6 +510,8 @@ namespace GameArchitectureEngine
         public void InitialiseCollidableObjects()
         {
             collisionManager.AddCollidable(player);
+            collisionManager.AddCollidable(mousePointer);
+
             foreach (HealthPotionGameObject potion in potions)
                 collisionManager.AddCollidable(potion);
 
@@ -481,7 +521,7 @@ namespace GameArchitectureEngine
 
         public void ResolveRemovals()
         {
-            List<Collidable> toRemove = new List<Collidable>();
+            List<Collidable> toRemove = new List<Collidable>();            
 
             foreach (HealthPotionGameObject potion in potions)
             {
@@ -495,12 +535,13 @@ namespace GameArchitectureEngine
                 {
                     if (toRemove[i].Equals(potions[j]))
                     {
-                        potions.RemoveAt(i);                        
+                        potions.RemoveAt(i);
+                        GameInfo.Instance.HealthPotionInfoArray.RemoveAt(i);                   
                     }
                 }
             }
 
-            collisionManager.RemoveCollidable(toRemove);
+            collisionManager.RemoveCollidable(toRemove);            
         }
 
         #region event testing
@@ -527,7 +568,6 @@ namespace GameArchitectureEngine
 
             if (potion != null)
                 potion.OnHealPlayer();
-            //throw new NotImplementedException();
         }
 
         private void CollideWithEnemyTest(object sender, object passedInEnemy, CollisionEventArgs e)
@@ -543,7 +583,6 @@ namespace GameArchitectureEngine
         private void MouseSelectEnemyToAttack(object sender, CollisionEventArgs e)
         {
             EnemyGameObject enemy = sender as EnemyGameObject;
-
             player.CanAttack = true;
         }
         #endregion
@@ -619,5 +658,24 @@ namespace GameArchitectureEngine
                 nextMapCurrentTime += gameTime.ElapsedGameTime.TotalSeconds;
             }            
         }
+
+        public void SaveGame(eButtonState buttonState, Vector2 amount)
+        {
+            GameInfo.Instance.PlayerInfo.Position = player.Position;
+            GameInfo.Instance.PlayerInfo.Health = player.Health;
+
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                GameInfo.Instance.EnemyInfoArray[i].Position = enemies[i].Position;
+                GameInfo.Instance.EnemyInfoArray[i].Health = enemies[i].Health;
+            }
+
+            for (int i = 0; i < potions.Count; i++)
+            {
+                GameInfo.Instance.HealthPotionInfoArray[i].Position = potions[i].Position;
+            }
+
+            Resources.WriteSaveFile(@"save.xml");
+        }        
     }
 }

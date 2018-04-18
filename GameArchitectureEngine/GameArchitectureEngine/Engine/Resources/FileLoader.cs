@@ -87,6 +87,24 @@ namespace GameArchitectureEngine
             }
         }
 
+        public void WriteXML(string filename)
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(filename))
+                {
+                    XmlSerializer xml = new XmlSerializer(typeof(GameInfo));
+                    
+                    xml.Serialize(writer, GameInfo.Instance);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR: XML file could not be serialised");
+                Console.WriteLine("Exception Message: " + e.Message);
+            }
+        }
+
         public Map ReadMap(string path)
         {
             int lineNo = 0;

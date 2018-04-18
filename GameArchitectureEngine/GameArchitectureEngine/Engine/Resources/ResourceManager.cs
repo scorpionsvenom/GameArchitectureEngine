@@ -225,13 +225,21 @@ namespace GameArchitectureEngine
                 }
             }
         }
-
-        public void LoadMap(string filename)
-        {            
-            filename = filename.Substring(filename.IndexOf("Content")); 
+        
+        /// <summary>
+        /// Reads save xml file using the fileLoader object's ReadXML method
+        /// </summary>
+        public void ReadSaveFile(string path)
+        {
+            fileLoader.ReadXML(path);
         }
 
-        public string CleanPath(string path)
+        public void WriteSaveFile(string path)
+        {
+            fileLoader.WriteXML(path);
+        }
+
+        private string CleanPath(string path)
         {
             string cleanedPath = path;
             cleanedPath = cleanedPath.Substring(0, cleanedPath.Length - extensionLength);

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<GameInfo>
+  <PlayerInfo>
+    <position>
+      <X>50</X>
+      <Y>50></Y>
+    </position>
+    <health>50</health>
+  </PlayerInfo>
+
+
+  <EnemyInfo>
+    <position>
+      <X>500</X>
+      <Y>150</Y>
+    </position>
+    <health>100</health>
+  </EnemyInfo>
+
+
+
+  <HealthPotionInfo>
+    <position>
+      <X>480</X>
+      <Y>480</Y>
+    </position>
+  </HealthPotionInfo>
+
+</GameInfo>

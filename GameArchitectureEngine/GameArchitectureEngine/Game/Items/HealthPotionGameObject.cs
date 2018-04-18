@@ -75,9 +75,7 @@ namespace GameArchitectureEngine
             PlayerGameObject player = col as PlayerGameObject;
 
             if (player != null)
-            {
-                //TODO: fire event to heal player
-                //OnHealPlayer(); 
+            {                
                 player.OnCollisionWithPotion(this);
                 flagForRemoval = true;
             }

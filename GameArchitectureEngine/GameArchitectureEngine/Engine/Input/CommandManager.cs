@@ -11,7 +11,7 @@ namespace GameArchitectureEngine
 
     public class CommandManager
     {
-        private InputListener m_Input;
+        public InputListener m_Input;
 
         private Dictionary<Keys, GameAction> m_KeyBindings = new Dictionary<Keys, GameAction>();
         private Dictionary<MouseButton, GameAction> m_MouseButtonBindings = new Dictionary<MouseButton, GameAction>();

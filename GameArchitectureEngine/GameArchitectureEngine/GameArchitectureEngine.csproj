@@ -107,6 +107,7 @@
     <Compile Include="Game\States\GameStates\GameOverState.cs" />
     <Compile Include="Game\States\GameStates\IntroScreenState.cs" />
     <Compile Include="Game\States\GameStates\MainGameState.cs" />
+    <Compile Include="Game\States\PlayerStates\PlayerChaseState.cs" />
     <Compile Include="Game\States\PlayerStates\PlayerAttackState.cs" />
     <Compile Include="Game\States\PlayerStates\PlayerDieState.cs" />
     <Compile Include="Game\States\PlayerStates\WalkState.cs" />

@@ -33,6 +33,7 @@ namespace GameArchitectureEngine
         public int Health
         {
             get { return health; }
+            set { health = value; }
         }
 
         private int maxHealth;
@@ -171,7 +172,7 @@ namespace GameArchitectureEngine
             int top = idleAnimation.FrameHeight - height;
             localBounds = new Rectangle(left, top, width, height);
                         
-            BoundingBox = new Rectangle(BoundingRectangle.X, BoundingRectangle.Y, BoundingRectangle.Width, BoundingRectangle.Height);
+            
 
             attackRangeRectangle = new Rectangle((int)Position.X - (attackAnimation.FrameWidth / 2), (int)Position.Y - attackAnimation.FrameHeight, attackAnimation.FrameWidth, attackAnimation.FrameHeight);
         }
@@ -189,7 +190,9 @@ namespace GameArchitectureEngine
 
             canAttack = (attackRangeRectangle.Intersects(player.BoundingBox));
 
-            Position += Velocity;          
+            Position += Velocity;
+
+            BoundingBox = new Rectangle((int)Position.X - idleAnimation.FrameWidth / 2, (int)Position.Y - idleAnimation.FrameWidth / 2, idleAnimation.FrameWidth, idleAnimation.FrameWidth); 
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch sprBatch)
@@ -245,6 +248,39 @@ namespace GameArchitectureEngine
         public override void Reset(Vector2 position)
         {
             throw new NotImplementedException();
+        }
+
+        public override bool CollisionTest(Collidable col)
+        {
+            if (col != null)
+            {
+                //OnCollision(col);
+                return BoundingBox.Intersects(col.BoundingBox);                
+            }
+
+            return false;
+        }
+
+        public override void OnCollision(Collidable col)
+        {
+            EnemyGameObject enemy = col as EnemyGameObject;
+
+            if (enemy != null)
+            {
+                Point enemyCentre = enemy.BoundingBox.Center;
+                Point centre = BoundingBox.Center;
+
+                Vector2 enemyCentreVector = new Vector2(enemyCentre.X, enemyCentre.Y);
+                Vector2 centreVector = new Vector2(centre.X, centre.Y);
+
+                Vector2 collisionNormal = Vector2.Normalize(enemyCentreVector - centreVector);
+
+                float distance = Vector2.Distance(enemyCentreVector, centreVector);
+
+                float penetrationDepth = ((enemy.BoundingBox.Width / 2 + BoundingBox.Width / 2) - distance) * 0.08f;
+
+                Position += (-collisionNormal * penetrationDepth);
+            }
         }
     }
 }

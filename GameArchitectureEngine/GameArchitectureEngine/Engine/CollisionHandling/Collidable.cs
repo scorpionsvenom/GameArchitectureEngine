@@ -12,7 +12,7 @@ namespace GameArchitectureEngine
     {        
         public bool flagForRemoval;
 
-        private Rectangle boundingBox;
+        protected Rectangle boundingBox;
         public Rectangle BoundingBox
         {
             get { return boundingBox; }

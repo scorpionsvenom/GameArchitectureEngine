@@ -25,6 +25,7 @@ namespace GameArchitectureEngine
         public int Health
         {
             get { return health; }
+            set { health = value; }
         }
 
         private int maxHealth;
@@ -101,7 +102,7 @@ namespace GameArchitectureEngine
         public PlayerGameObject()
         {
             //TODO: set position from serialised object
-            Position = new Vector2(480f, 480f);
+            Position = new Vector2(0.0f, 0.0f);
         }
 
         public override void Initialise()
