@@ -40,17 +40,6 @@
       <Importer>WmaImporter</Importer>
       <Processor>SongProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Player\Swordswing.png">
-      <Name>Swordswing</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <None Include="XML\Info.xml">
-      <Name>Info</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Maps\0.txt">
@@ -73,7 +62,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Sprites\Environment\" />
+    <Compile Include="Sprites\Powerups\AttackBoostPotion.png">
+      <Name>AttackBoostPotion</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Sprites\Player\WalkSpriteSheet.png">
@@ -123,11 +116,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sounds\SFX\ExitReached.wma">
-      <Name>ExitReached</Name>
-      <Importer>WmaImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-    </Compile>
     <Compile Include="Sounds\SFX\GemCollected.wma">
       <Name>GemCollected</Name>
       <Importer>WmaImporter</Importer>
@@ -143,18 +131,8 @@
       <Importer>WmaImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
     </Compile>
-    <Compile Include="Sounds\SFX\PlayerJump.wma">
-      <Name>PlayerJump</Name>
-      <Importer>WmaImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-    </Compile>
     <Compile Include="Sounds\SFX\PlayerKilled.wma">
       <Name>PlayerKilled</Name>
-      <Importer>WmaImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-    </Compile>
-    <Compile Include="Sounds\SFX\Powerup.wma">
-      <Name>Powerup</Name>
       <Importer>WmaImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
     </Compile>
@@ -196,6 +174,25 @@
   <ItemGroup>
     <Compile Include="Sprites\Enemies\EnemyDie.png">
       <Name>EnemyDie</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Environment\Rock.png">
+      <Name>Rock</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Environment\Tree.png">
+      <Name>Tree</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Misc\BloodSplatter.png">
+      <Name>BloodSplatter</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

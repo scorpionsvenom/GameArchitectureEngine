@@ -40,7 +40,7 @@ namespace GameArchitectureEngine
 
             if (enemy == null) return;
 
-            enemy.MoveToward(enemy.Player, gameTime);        
+            enemy.MoveToward(enemy.Target, gameTime);        
         }
 
         

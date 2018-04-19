@@ -54,8 +54,7 @@ namespace GameArchitectureEngine
         public Collidable Collidable;
 
         private ResourceManager Resources;
-
-        private Vector2 velocity;
+        
         private Animation walkAnimation;
         private Animation attackAnimation;
         private Animation death;
@@ -80,13 +79,7 @@ namespace GameArchitectureEngine
         private Vector2 lastMouseLocation = Vector2.Zero;
         private float stoppingDistance = 3.0f;
 
-        public Vector2 Velocity
-        {
-            get { return velocity; }
-            set { velocity = value; }
-        }
-
-        GameTime gameTime;
+        private GameTime gameTime;
 
         private const float maxSpeed = 160.0f;
         public float MaxSpeed
@@ -123,13 +116,13 @@ namespace GameArchitectureEngine
 
         private bool isCloseEnoughToAttack = false;
 
-        public EnemyGameObject target = null;
+        public GameObjectBase target = null;
         private Vector2 targetPosition;
+
+        public bool retrieveItem = false;
 
         public PlayerGameObject()
         {
-            //TODO: set position from serialised object
-            Position = new Vector2(0.0f, 0.0f);
         }
 
         public override void Initialise()
@@ -143,7 +136,7 @@ namespace GameArchitectureEngine
                         
             walkState.AddTransitions(new Transition(chaseState, () => canAttack));
             chaseState.AddTransitions(new Transition(attackState, () => isCloseEnoughToAttack));
-
+            
             attackState.AddTransitions(new Transition(walkState, () => !canAttack));
             attackState.AddTransitions(new Transition(chaseState, () => (canAttack && !isCloseEnoughToAttack)));
 
@@ -197,7 +190,27 @@ namespace GameArchitectureEngine
 
             isDying = (health <= 0);
 
-            if (target != null) targetPosition = target.Position;
+            //if there is a selected target, make sure the target is alive before attacking.
+            if (target != null)
+            {
+                targetPosition = target.Position;
+
+                //if the target is an enemy and is no longer alive, set it to null, switch off canAttack, and set velocity to 0 to stop moving.
+                if (target != null)
+                {
+                    EnemyGameObject enemy = target as EnemyGameObject;
+
+                    if (enemy != null)
+                    {
+                        if (!enemy.IsAlive)
+                        {
+                            canAttack = false;
+                            target = null;
+                            Velocity = Vector2.Zero;
+                        }
+                    }
+                }
+            }
 
             if (!isDying)
             {
@@ -213,7 +226,9 @@ namespace GameArchitectureEngine
                 if (Vector2.Distance(lastMouseLocation, Position) < stoppingDistance)
                     velocity = Vector2.Zero;
                 else
-                    Position += velocity;
+                {
+                    Position += Velocity;
+                }
 
                 BoundingBox = BoundingRectangle;
             }
@@ -258,22 +273,21 @@ namespace GameArchitectureEngine
                     Velocity = direction;
 
                     canAttack = isCloseEnoughToAttack = false;
-                }
-                else
-                {
-                    //lastMouseLocation = 
-                }
+                }               
             }
         }
 
         public void MoveTowardEntity(GameObjectBase obj, GameTime gameTime)
         {
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (obj != null)
+            {
+                float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            Vector2 directionToChase = obj.Position - Position;
+                Vector2 directionToChase = obj.Position - Position;
 
-            directionToChase.Normalize();
-            Velocity = directionToChase * speed * elapsedTime;
+                directionToChase.Normalize();
+                Velocity = directionToChase * speed * elapsedTime;
+            }            
         }
 
         internal void Die()
@@ -301,6 +315,14 @@ namespace GameArchitectureEngine
             {                
                 isCloseEnoughToAttack = true;
             }
+
+            HealthPotionGameObject potion = col as HealthPotionGameObject;
+
+            if (potion != null && retrieveItem)
+            {
+                potion.flagForRemoval = true;
+                HealPlayer(50);
+            }
         }
 
         public void HealPlayer(int amount)
@@ -323,16 +345,23 @@ namespace GameArchitectureEngine
 
         public void Attack()
         {
-            sprite.PlayAnimation(attackAnimation);
+            //Check if the target is an enemy, and then attack
+            EnemyGameObject enemy = target as EnemyGameObject;
 
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (enemy != null)
+            {
 
-            Vector2 directionToChase = target.Position - Position;
+                sprite.PlayAnimation(attackAnimation);
 
-            directionToChase.Normalize();
-            Velocity = directionToChase * speed / 4 * elapsedTime;
+                float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            OnDamageEnemy(target);
+                Vector2 directionToChase = enemy.Position - Position;
+
+                directionToChase.Normalize();
+                Velocity = directionToChase * speed / 4 * elapsedTime;
+
+                OnDamageEnemy(enemy);
+            }
         }
 
         public void OnDamageEnemy(EnemyGameObject enemy)
@@ -340,10 +369,10 @@ namespace GameArchitectureEngine
             DamageEnemy?.Invoke(this, enemy, new CollisionEventArgs(Position));
         }
 
-        public void OnCollisionWithPotion(HealthPotionGameObject potion)
-        {
-            CollideWithPotion?.Invoke(this, potion, new CollisionEventArgs(Position));
-        }
+        //public void OnCollisionWithPotion(HealthPotionGameObject potion)
+        //{
+        //    CollideWithPotion?.Invoke(this, potion, new CollisionEventArgs(Position));
+        //}
 
         public void OnCollisionWithEnemy(EnemyGameObject enemy)
         {

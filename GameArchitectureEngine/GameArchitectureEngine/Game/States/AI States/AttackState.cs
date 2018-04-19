@@ -8,7 +8,7 @@ namespace GameArchitectureEngine
 {
     public class AttackState : State
     {
-        private const double attackCooldownTime = 0.75;
+        private const double attackCooldownTime = 0.5;
         private double currentTime = 0.0;
 
         public override void Enter(object owner)

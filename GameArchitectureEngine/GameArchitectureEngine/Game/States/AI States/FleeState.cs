@@ -36,11 +36,11 @@ namespace GameArchitectureEngine
 
             if (enemy == null) return;
 
-            if (enemy.Player != null)
+            if (enemy.Target != null)
             {
                 if (enemy.PlayerSeen)
                 {
-                    Vector2 newDirection = enemy.Position - enemy.Player.Position;
+                    Vector2 newDirection = enemy.Position - enemy.Target.Position;
                     newDirection.Normalize();
                     enemy.Direction = newDirection;
                     enemy.Velocity = enemy.Direction * enemy.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;

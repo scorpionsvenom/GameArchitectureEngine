@@ -15,6 +15,11 @@ namespace GameArchitectureEngine
             collidables.Add(col);            
         }
 
+        public void ClearCollidables()
+        {
+            collidables.Clear();
+        }
+
         public void Update()
         {
             UpdateCollisions();

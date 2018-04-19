@@ -10,6 +10,7 @@ namespace GameArchitectureEngine
     public class EnemyGameObject : GameObjectBase
     {
         public event CollisionHandler DamagePlayer;
+        public event EventHandler EnemyDies;
 
         public enum EnemyState
         {
@@ -20,7 +21,6 @@ namespace GameArchitectureEngine
             Die,
         }
         public EnemyState state = EnemyState.Idle;
-
 
         public const float ChaseSpeed = 88.0f;
         public const float WanderSpeed = 48.0f;
@@ -33,27 +33,18 @@ namespace GameArchitectureEngine
             set { speed = value; }
         }
 
-        public FSM fsm;
-        public IdleState idle;
-        public FleeState flee;
-        public ChaseState chase;
-        public AttackState attack;
-        public DieState die;
+        private FSM fsm;
+        private IdleState idle;
+        private FleeState flee;
+        private ChaseState chase;
+        private AttackState attack;
+        private DieState die;
 
-        GameTime gameTime;
+        private GameTime gameTime;
 
-        Animation idleAnimation;
-
-        internal void Die()
-        {
-            speed = 0.0f;
-            isAlive = false;
-            canAttack = false;
-        }
-
+        private Animation idleAnimation;
         Animation attackAnimation;
         Animation dieAnimation;
-
         AnimationPlayer sprite;
 
         private int health;
@@ -75,12 +66,6 @@ namespace GameArchitectureEngine
             get { return isWeak; }
         }
 
-        private Vector2 velocity;
-        public Vector2 Velocity
-        {
-            get { return velocity; }
-            set { velocity = value; }
-        }
         private SpriteEffects flip = SpriteEffects.None;
 
         bool isAlive = true;
@@ -120,8 +105,6 @@ namespace GameArchitectureEngine
             get { return attackRange; }            
         }
 
-        public Collidable Collidable;
-
         private Rectangle attackRangeRectangle;
 
         private Rectangle localBounds;
@@ -136,11 +119,12 @@ namespace GameArchitectureEngine
                 return new Rectangle(left, top, localBounds.Width, localBounds.Height);
             }
         }
-        
-        private GameObjectBase player;
-        public GameObjectBase Player
+
+        //GameObjectBase to allow for chasing NPCs etc.
+        private GameObjectBase target;
+        public GameObjectBase Target
         {
-            get { return player; }
+            get { return target; }
         }
 
         public EnemyGameObject(Vector2 position, GameObjectBase player, int health, int maxHealth)
@@ -149,7 +133,14 @@ namespace GameArchitectureEngine
             this.maxHealth = maxHealth;
 
             Position = position;
-            this.player = player;
+            this.target = player;
+        }
+
+        private bool droppedPotion = false;
+
+        public override void Initialise()
+        {
+            
         }
 
         public override void LoadContent(ResourceManager resources)
@@ -190,16 +181,14 @@ namespace GameArchitectureEngine
             fsm.Initialise("Idle");
 
             idleAnimation = new Animation(resources.SpriteSheets["Sprites/Enemies/EnemyIdle"], 0.5f, true);
-            attackAnimation = new Animation(resources.SpriteSheets["Sprites/Enemies/Attack"], 0.25f, true);
+            attackAnimation = new Animation(resources.SpriteSheets["Sprites/Enemies/Attack"], 0.5f, true);
             dieAnimation = new Animation(resources.SpriteSheets["Sprites/Enemies/EnemyDie"], 0.5f, false);
 
             int width = (int)(idleAnimation.FrameWidth * 0.4f);
             int left = (idleAnimation.FrameWidth - width) / 2;
             int height = (int)(idleAnimation.FrameHeight * 0.8);
             int top = idleAnimation.FrameHeight - height;
-            localBounds = new Rectangle(left, top, width, height);
-
-            attackRangeRectangle = new Rectangle((int)Position.X - (attackAnimation.FrameWidth / 2), (int)Position.Y - attackAnimation.FrameHeight, attackAnimation.FrameWidth, attackAnimation.FrameHeight);
+            localBounds = new Rectangle(left, top, width, height);            
         }
 
         public override void Update(GameTime gameTime)
@@ -208,16 +197,30 @@ namespace GameArchitectureEngine
 
             if (isAlive)
             {
-                sprite.PlayAnimation(idleAnimation);
+                switch(state)
+                {
+                    case EnemyState.Idle:
+                    case EnemyState.Flee:
+                    case EnemyState.Chase:                            
+                        sprite.PlayAnimation(idleAnimation);
+                        break;
+                    case EnemyState.Attack:
+                        sprite.PlayAnimation(attackAnimation);
+                        break;
+                    default:
+                        sprite.PlayAnimation(idleAnimation);
+                        break;
+                }
 
                 this.gameTime = gameTime;
 
                 isWeak = (Health < MaxHealth / 2);
-                playerSeen = (Vector2.Distance(Position, player.Position) < SightRange);
 
-                attackRangeRectangle = new Rectangle((int)Position.X - (attackAnimation.FrameWidth / 2), (int)Position.Y - attackAnimation.FrameHeight, attackAnimation.FrameWidth, attackAnimation.FrameHeight);
+                playerSeen = (Vector2.Distance(Position, target.Position) < SightRange);
 
-                canAttack = (attackRangeRectangle.Intersects(player.BoundingBox));
+                attackRangeRectangle = new Rectangle((int)Position.X - (attackAnimation.FrameWidth / 2), (int)Position.Y - (attackAnimation.FrameHeight / 2), attackAnimation.FrameWidth, attackAnimation.FrameHeight);
+
+                canAttack = (attackRangeRectangle.Intersects(target.BoundingBox));
 
                 Position += Velocity;
 
@@ -243,6 +246,7 @@ namespace GameArchitectureEngine
             sprite.Draw(gameTime, sprBatch, Position, flip);
         }
 
+        //Setting this to the base object allows an enemy to be set to chase an NPC, for example.
         public void MoveToward(GameObjectBase obj, GameTime gameTime)
         {
             if (sprite.Animation != idleAnimation) sprite.PlayAnimation(idleAnimation);
@@ -292,7 +296,6 @@ namespace GameArchitectureEngine
         {
             if (col != null)
             {
-                //OnCollision(col);
                 return BoundingBox.Intersects(col.BoundingBox);                
             }
 
@@ -319,6 +322,18 @@ namespace GameArchitectureEngine
 
                 Position += (-collisionNormal * penetrationDepth);
             }
+        }
+
+        public void Die()
+        {
+            if (droppedPotion) return;
+
+            speed = 0.0f;
+            isAlive = false;
+            canAttack = false;
+
+            EnemyDies?.Invoke(this, EventArgs.Empty);
+            droppedPotion = true;
         }
     }
 }

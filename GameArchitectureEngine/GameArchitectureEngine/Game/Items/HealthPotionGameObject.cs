@@ -33,6 +33,11 @@ namespace GameArchitectureEngine
             Position = position;
         }
 
+        public override void Initialise()
+        {
+            
+        }
+
         public override void LoadContent(ResourceManager resources)
         {
             displayAnimation = new Animation(resources.SpriteSheets["Sprites/Powerups/Potion"], 0.5f, true);
@@ -70,16 +75,16 @@ namespace GameArchitectureEngine
             return false;
         }
 
-        public override void OnCollision(Collidable col)
-        {
-            PlayerGameObject player = col as PlayerGameObject;
+        //public override void OnCollision(Collidable col)
+        //{
+        //    PlayerGameObject player = col as PlayerGameObject;
 
-            if (player != null)
-            {                
-                player.OnCollisionWithPotion(this);
-                flagForRemoval = true;
-            }
-        }
+        //    if (player != null)
+        //    {                
+        //        player.OnCollisionWithPotion(this);
+        //        flagForRemoval = true;
+        //    }
+        //}
 
         public override void Reset(Vector2 position)
         {

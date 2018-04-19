@@ -29,6 +29,37 @@ namespace GameArchitectureEngine
             Point pos = new Point((int)vectorToCheck.X, (int)vectorToCheck.Y);
 
             return graphicsDevice.Viewport.Bounds.Contains(pos);
-        }        
+        }
+        
+        public static List<GameObjectBase> SelectionSortList(List<GameObjectBase> listToSort)
+        {
+            int min_index = 0;
+
+            for (int i = 0; i < listToSort.Count - 1; i++)
+            {
+                min_index = i;
+
+                for (int j = i + i; j < listToSort.Count; j++)
+                {
+                    if (listToSort[j].Depth < listToSort[min_index].Depth)
+                        min_index = j;
+                }
+
+                GameObjectBase a = listToSort[i];
+                GameObjectBase b = listToSort[min_index];
+                
+                listToSort[i] = b;
+                listToSort[min_index] = a;
+            }
+
+            return listToSort;
+        } 
+
+        private static void Swap(ref GameObjectBase a, ref GameObjectBase b)
+        {
+            GameObjectBase temp = a;
+            a = b;
+            b = temp;
+        }
     }
 }

@@ -13,10 +13,9 @@ namespace GameArchitectureEngine
         public event CollisionHandler SelectEnemy;
 
         public CommandManager commandManager;
-
-        private int mapWidth;
-        private int mapHeight;
+        
         public Texture2D Icon;
+
         public MouseState mouseState;
 
         //For collision with enemy, allowing player to attack
@@ -35,16 +34,16 @@ namespace GameArchitectureEngine
             //commandManager.m_Input.OnKeyPressed += MousePressed;
         }
 
+        public override void Initialise()
+        {            
+        }
+
         /// <summary>
-        /// Can't override base class here because this class needs map dimensions for clamping the mouse coords.
+        /// 
         /// </summary>
-        /// <param name="resources"></param>
-        /// <param name="mapWidth"></param>
-        /// <param name="mapHeight"></param>
         public override void LoadContent(ResourceManager resources)
         {
             Icon = resources.SpriteSheets["Sprites/Player/MouseIcon"];
-            //BoundingBox = new Rectangle();
         }
 
         public override void Update(GameTime gameTime)
@@ -53,12 +52,6 @@ namespace GameArchitectureEngine
 
             Vector2 mousePosition = new Vector2(mouseState.X, mouseState.Y);
             
-            ////Clamp values
-            //if (mousePosition.X < 0) mousePosition.X = 0;
-            //if (mousePosition.Y < 0) mousePosition.Y = 0;
-            //if (mousePosition.X > mapWidth) mousePosition.X = mapWidth;
-            //if (mousePosition.Y > mapHeight) mousePosition.Y = mapHeight;
-
             Position = mousePosition;
             BoundingBox = new Rectangle((int)(Position.X - rectDimensions / 2), (int)(Position.Y - rectDimensions / 2), rectDimensions, rectDimensions);            
         }
@@ -96,21 +89,43 @@ namespace GameArchitectureEngine
 
         public override void OnCollision(Collidable col)
         {
-            EnemyGameObject enemy = col as EnemyGameObject;
+            //EnemyGameObject enemy = col as EnemyGameObject;
 
-            if (enemy != null)
+            if (col != null)
             {
-                OnCollisionWithEnemy(col as EnemyGameObject);
+                OnCollisionWithEntity(col as GameObjectBase);
             }
         }
 
-        public void OnCollisionWithEnemy(EnemyGameObject enemy)
+        public void OnCollisionWithEntity(GameObjectBase entity)
         {
             MouseState state = Mouse.GetState();            
 
-            if (enemy != null && state.LeftButton == ButtonState.Pressed)
+            if (entity != null && state.LeftButton == ButtonState.Pressed)
             {
-                SelectEnemy?.Invoke((object)enemy, new CollisionEventArgs(enemy.Position));
+                EnemyGameObject enemy = entity as EnemyGameObject;
+
+                if (enemy != null)
+                {
+                    if (enemy.IsAlive)
+                    {
+                        player.CanAttack = true;
+                        player.target = enemy;
+                    }
+                }
+
+                HealthPotionGameObject potion = entity as HealthPotionGameObject;
+
+                //MouseState state = Mouse.GetState();
+
+                if (potion != null)
+                {
+                    player.target = potion;
+                    player.retrieveItem = true;
+                    //TODO: move player towards selected item
+                    //player.MoveTowards(state, new Vector2(state.X, state.Y));
+                }
+                //SelectEnemy?.Invoke((object)enemy, new CollisionEventArgs(enemy.Position));
             }
         }
 
@@ -120,8 +135,11 @@ namespace GameArchitectureEngine
 
             if (enemy != null)
             {
-                player.CanAttack = true;
-                player.target = enemy;
+                if (enemy.IsAlive)
+                {
+                    player.CanAttack = true;
+                    player.target = enemy;
+                }
             }           
 
             HealthPotionGameObject potion = sender as HealthPotionGameObject;
@@ -130,6 +148,7 @@ namespace GameArchitectureEngine
 
             if (potion != null)
             {
+                player.target = potion;
                 //TODO: move player towards selected item
                 //player.MoveTowards(state, new Vector2(state.X, state.Y));
             }

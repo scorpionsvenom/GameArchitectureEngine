@@ -18,11 +18,30 @@ namespace GameArchitectureEngine
     {
         public Vector2 Position = Vector2.Zero;
         public int Health = 0;
+
+        public EnemyInfo()
+        {
+
+        }
+
+        public EnemyInfo(Vector2 position)
+        {
+            Position = position;
+        }
     }
 
     public class HealthPotionInfo
     {
         public Vector2 Position = Vector2.Zero;
+
+        public HealthPotionInfo()
+        {
+        }
+
+        public HealthPotionInfo(Vector2 position)
+        {
+            Position = position;
+        }
     }
 
     /// <summary>
