@@ -159,10 +159,9 @@ namespace GameArchitectureEngine
         public override void LoadContent(ResourceManager resources)
         {
             gameTime = new GameTime();
-            //TODO: Keep local copy of resource manager, don't think this is a good approach
+            
             Resources = resources;
-
-            //TODO: Too specific, i think this class shouldn't need to know so many specifics, they should be passed in
+                        
             walkAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/WalkSpriteSheet"],0.25f, true);
             attackAnimation = new Animation(Resources.SpriteSheets["Sprites/Player/Attack"], 0.25f, true);
             death = new Animation(Resources.SpriteSheets["Sprites/Player/Death"], 0.25f, false);
@@ -173,9 +172,9 @@ namespace GameArchitectureEngine
             int height = (int)(walkAnimation.FrameHeight * 0.8);
             int top = walkAnimation.FrameHeight - height;
             localBounds = new Rectangle(left, top, width, height);
-
-            //Collidable = new Collidable();
+            
             BoundingBox = BoundingRectangle;
+
             //sounds
         }
 

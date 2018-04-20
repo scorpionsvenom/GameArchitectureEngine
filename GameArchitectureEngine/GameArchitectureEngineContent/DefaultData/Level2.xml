@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<GameInfo>
+  <PlayerInfo>
+    <Position>
+      <X>50</X>
+      <Y>50</Y>
+    </Position>
+    <Health>50</Health>
+	<AttackPower>25</AttackPower>
+  </PlayerInfo>
+  <EnemyInfoArray>
+    <EnemyInfo>
+      <Position>
+        <X>500</X>
+        <Y>150</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+    <EnemyInfo>
+      <Position>
+        <X>200</X>
+        <Y>600</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+    <EnemyInfo>
+      <Position>
+        <X>700</X>
+        <Y>800</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+  </EnemyInfoArray>
+  <HealthPotionInfoArray>
+    <HealthPotionInfo>
+      <Position>
+        <X>480</X>
+        <Y>480</Y>
+      </Position>
+    </HealthPotionInfo>
+  </HealthPotionInfoArray>  
+  <LevelIndex>2</LevelIndex>
+</GameInfo>

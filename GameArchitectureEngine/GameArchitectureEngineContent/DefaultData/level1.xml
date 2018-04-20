@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<GameInfo>
+  <PlayerInfo>
+    <Position>
+      <X>50</X>
+      <Y>50</Y>
+    </Position>
+    <Health>50</Health>
+	<AttackPower>25</AttackPower>
+  </PlayerInfo>
+  <EnemyInfoArray>
+    <EnemyInfo>
+      <Position>
+        <X>520</X>
+        <Y>150</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+    <EnemyInfo>
+      <Position>
+        <X>600</X>
+        <Y>150</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+    <EnemyInfo>
+      <Position>
+        <X>500</X>
+        <Y>250</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+    <EnemyInfo>
+      <Position>
+        <X>350</X>
+        <Y>400</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+    <EnemyInfo>
+      <Position>
+        <X>200</X>
+        <Y>600</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+    <EnemyInfo>
+      <Position>
+        <X>700</X>
+        <Y>800</Y>
+      </Position>
+      <Health>100</Health>
+    </EnemyInfo>
+  </EnemyInfoArray>
+  <HealthPotionInfoArray>
+    <HealthPotionInfo>
+      <Position>
+        <X>480</X>
+        <Y>480</Y>
+      </Position>
+    </HealthPotionInfo>
+  </HealthPotionInfoArray>
+  <TreeInfoArray>
+
+    <TreeInfo>
+      <Position>
+        <X>500</X>
+        <Y>600</Y>
+      </Position>
+    </TreeInfo>
+
+    <TreeInfo>
+      <Position>
+        <X>380</X>
+        <Y>420</Y>
+      </Position>
+    </TreeInfo>
+
+    <TreeInfo>
+      <Position>
+        <X>140</X>
+        <Y>150</Y>
+      </Position>
+    </TreeInfo>
+
+    <TreeInfo>
+      <Position>
+        <X>260</X>
+        <Y>300</Y>
+      </Position>
+    </TreeInfo>
+
+    <TreeInfo>
+      <Position>
+        <X>400</X>
+        <Y>240</Y>
+      </Position>
+    </TreeInfo>
+
+    <TreeInfo>
+      <Position>
+        <X>700</X>
+        <Y>580</Y>
+      </Position>
+    </TreeInfo>
+
+    <TreeInfo>
+      <Position>
+        <X>500</X>
+        <Y>600</Y>
+      </Position>
+    </TreeInfo>
+
+  </TreeInfoArray>
+
+  <RockInfoArray>
+
+    <RockInfo>
+      <Position>
+        <X>800</X>
+        <Y>100</Y>
+      </Position>
+    </RockInfo>
+
+    <RockInfo>
+      <Position>
+        <X>100</X>
+        <Y>300</Y>
+      </Position>
+    </RockInfo>
+
+    <RockInfo>
+      <Position>
+        <X>500</X>
+        <Y>800</Y>
+      </Position>
+    </RockInfo>
+
+  </RockInfoArray>
+  <LevelIndex>1</LevelIndex>
+</GameInfo>

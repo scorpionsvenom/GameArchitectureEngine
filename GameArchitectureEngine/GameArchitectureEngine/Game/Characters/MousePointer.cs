@@ -131,26 +131,31 @@ namespace GameArchitectureEngine
 
         public void MouseSelectEntity(object sender, CollisionEventArgs e)
         {
-            EnemyGameObject enemy = sender as EnemyGameObject;
+            MouseState state = Mouse.GetState();
 
-            if (enemy != null)
+            if (state.LeftButton == ButtonState.Pressed)
             {
-                if (enemy.IsAlive)
+                EnemyGameObject enemy = sender as EnemyGameObject;
+
+                if (enemy != null)
                 {
-                    player.CanAttack = true;
-                    player.target = enemy;
+                    if (enemy.IsAlive)
+                    {
+                        player.CanAttack = true;
+                        player.target = enemy;
+                    }
                 }
-            }           
 
-            HealthPotionGameObject potion = sender as HealthPotionGameObject;
+                HealthPotionGameObject potion = sender as HealthPotionGameObject;
 
-            //MouseState state = Mouse.GetState();
+                //MouseState state = Mouse.GetState();
 
-            if (potion != null)
-            {
-                player.target = potion;
-                //TODO: move player towards selected item
-                //player.MoveTowards(state, new Vector2(state.X, state.Y));
+                if (potion != null)
+                {
+                    player.target = potion;
+                    //TODO: move player towards selected item
+                    //player.MoveTowards(state, new Vector2(state.X, state.Y));
+                }
             }
         }
 

@@ -7,10 +7,7 @@ using Microsoft.Xna.Framework;
 namespace GameArchitectureEngine
 {
     class MainGameState : State
-    {
-        private const double SceneChangeTime = 1.25;
-        private double currentTime = 0.0;
-
+    {        
         public MainGameState()
         {
             Name = "MainGame";
@@ -22,15 +19,9 @@ namespace GameArchitectureEngine
 
             if (game != null)
             {
-                //game.ResetScene();
                 game.gameState = GameState.MainGameState;
                 game.InitialiseMainGameState();
-                game.LoadMainGameContent();
-
-                //Load main game content. load correct map
-                
-                
-                               
+                game.LoadMainGameContent(true);
             }
         }
 
@@ -45,12 +36,7 @@ namespace GameArchitectureEngine
         }
 
         public override void Execute(object owner, GameTime gameTime)
-        {
-            ActionRPG game = owner as ActionRPG;
-
-            if (game == null) return;
-
-            
+        {          
         }
     }
 }

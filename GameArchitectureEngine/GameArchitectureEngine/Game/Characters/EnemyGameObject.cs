@@ -47,7 +47,7 @@ namespace GameArchitectureEngine
         Animation dieAnimation;
         AnimationPlayer sprite;
 
-        private int health;
+        private int health = 100;
         public int Health
         {
             get { return health; }

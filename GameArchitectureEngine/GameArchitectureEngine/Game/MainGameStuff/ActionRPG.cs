@@ -22,11 +22,9 @@ namespace GameArchitectureEngine
         static int nextScreenCalled = 0;
         static int nextMapCalled = 0;
 
-        //private const double eventCoolDownTime = 0.25;
-        //private double nextScreenCurrentTime = 0.25;
-        //private double nextMapCurrentTime = 0.25;
         private GameTime gameTime;
 
+        //Master list of entities in the scene
         private List<GameObjectBase> entities;
 
         private GraphicsDeviceManager graphics;
@@ -53,8 +51,11 @@ namespace GameArchitectureEngine
 
         public GameState gameState = GameState.IntroState;
 
+        //Used for specific operations on these types of objects
         private List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
         private List<EnemyGameObject> enemies = new List<EnemyGameObject>();
+        private List<Tree> trees = new List<Tree>();
+        private List<Rock> rocks = new List<Rock>();
 
         private PlayerGameObject player;
         public PlayerGameObject Player
@@ -64,16 +65,17 @@ namespace GameArchitectureEngine
 
         public MousePointer mousePointer;
 
-        Camera camera;
-        float zoom = 1.0f;
-        float rotation = 0.0f;
+        private Camera camera;
+        private float zoom = 1.0f;
+        private float rotation = 0.0f;
 
         Map currentMap;
-        int currentMapIndex = 0;
-        int currentMapWidth;
-        int currentMapHeight;
+        private int currentMapIndex = 0;
+        private int currentMapWidth;
+        private int currentMapHeight;
+        private bool loadNewMap = false;
 
-        SpriteBatch spriteBatch;
+        private SpriteBatch spriteBatch;
 
         public ActionRPG()
         {
@@ -147,18 +149,9 @@ namespace GameArchitectureEngine
             
             Commands = new CommandManager();   
             
-            mousePointer = new MousePointer(Commands, player);
+            mousePointer = new MousePointer(Commands, player);            
 
-            //mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
-            player.DamageEnemy += HurtEnemyTest;
-            //player.CollideWithPotion += CollideWithPotionTest;
-            player.CollideWithEnemy += CollideWithEnemyTest;
-            mousePointer.SelectEnemy += mousePointer.MouseSelectEntity;
-            //TODO Remove testings
-
-            InitialiseBindings();
-
-            
+            InitialiseBindings();            
         }
 
         public void InitialiseGameOverState()
@@ -201,73 +194,84 @@ namespace GameArchitectureEngine
             MediaPlayer.Play(Resources.Songs["Sounds/Songs/Leprosy-Death-Leprosy"]);
         }
 
-        public void LoadMainGameContent()
+        public void LoadMainGameContent(bool loadGameFromDefault)
         {
             Resources.LoadContent(Content, GraphicsDevice);
 
-            Resources.ReadSaveFile(@"save.xml");
-
-            Player.Position = GameInfo.Instance.PlayerInfo.Position;
-            Player.Health = GameInfo.Instance.PlayerInfo.Health;
-
-            for (int i = 0; i < GameInfo.Instance.EnemyInfoArray.Count; i++)
-                enemies.Add(new EnemyGameObject(GameInfo.Instance.EnemyInfoArray[i].Position, player, GameInfo.Instance.EnemyInfoArray[i].Health, 100));
-
-            for (int i = 0; i < GameInfo.Instance.HealthPotionInfoArray.Count; i++)
-                potions.Add(new HealthPotionGameObject(GameInfo.Instance.HealthPotionInfoArray[i].Position));                        
-            
-            for (int i = 0; i < enemies.Count; i++)
+            if (loadGameFromDefault)
             {
-                enemies[i].Position = GameInfo.Instance.EnemyInfoArray[i].Position;
-                enemies[i].Health = GameInfo.Instance.EnemyInfoArray[i].Health;
+                LoadGame(string.Format("Content/DefaultData/level{0}.xml", currentMapIndex));//LoadGame("save.xml");
+
+                entities.Add(player);
+                foreach (EnemyGameObject enemy in enemies)
+                    entities.Add(enemy);
+
+                foreach (HealthPotionGameObject potion in potions)
+                    entities.Add(potion);
+
+                foreach (Tree tree in trees)
+                    entities.Add(tree);
+
+                foreach (Rock rock in rocks)
+                    entities.Add(rock);
+
+                foreach (GameObjectBase gameObject in entities)
+                {
+                    gameObject.LoadContent(Resources);
+                }
             }
 
-            for (int i = 0; i < potions.Count; i++)
-            {
-                potions[i].Position = GameInfo.Instance.HealthPotionInfoArray[i].Position;
-            }
-
-            Player.IsAlive = true;
-            
             //TODO: manage Testings
-            foreach (EnemyGameObject enemy in enemies)
-                enemy.DamagePlayer += HurtPlayerTest;
-
-            //foreach (HealthPotionGameObject potion in potions)
-            //    potion.HealPlayer += HealPlayerTest;
-
+            player.CollideWithEnemy += CollideWithEnemyTest;            
             player.DamageEnemy += player.Damage;
 
-            foreach(EnemyGameObject enemy in enemies)
+            mousePointer.SelectEnemy += mousePointer.MouseSelectEntity;
+
+            foreach (EnemyGameObject enemy in enemies)
             {
                 enemy.EnemyDies += SpawnPotion;
+                enemy.DamagePlayer += HurtPlayerTest;
             }
+            //foreach (HealthPotionGameObject potion in potions)
+            //   potion.HealPlayer += HealPlayerTest;
+            //mousePointer.SelectEnemy += MouseSelectEnemyToAttack;
+            //player.DamageEnemy += HurtEnemyTest;
+            //player.CollideWithPotion += CollideWithPotionTest;
 
+            ClearMapTypes();            
             mapManager.LoadContent(Resources);
             LoadMapTypes();
-            
+
             if (currentMapIndex < Resources.Maps.Count)
                 currentMap = Resources.Maps[string.Format("Maps/{0}", currentMapIndex)];
+            else currentMap = Resources.Maps["Maps/0"];
 
             currentMapWidth = currentMap.MapList[0].Length * 64;
             currentMapHeight = currentMap.MapList.Count * 64;
-            
-            InitialiseCollidableObjects();
 
-            entities.Add(player);
+            //InitialiseCollidableObjects();
 
-            foreach (EnemyGameObject enemy in enemies)
-                entities.Add(enemy);
+            //entities.Add(player);
+            //foreach (EnemyGameObject enemy in enemies)
+            //    entities.Add(enemy);
 
-            foreach (HealthPotionGameObject potion in potions)
-                entities.Add(potion);
+            //foreach (HealthPotionGameObject potion in potions)
+            //    entities.Add(potion);
 
-            foreach (GameObjectBase gameObject in entities)
-            {
-                gameObject.LoadContent(Resources);
-            }
+            //foreach (Tree tree in trees)
+            //    entities.Add(tree);
+
+            //foreach (Rock rock in rocks)
+            //    entities.Add(rock);
+
+            //foreach (GameObjectBase gameObject in entities)
+            //{
+            //    gameObject.LoadContent(Resources);
+            //}            
 
             mousePointer.LoadContent(Resources);
+
+            InitialiseCollidableObjects();
 
             graphics.IsFullScreen = false;
             graphics.PreferredBackBufferHeight = currentMapHeight;
@@ -304,12 +308,25 @@ namespace GameArchitectureEngine
 
         public void UnloadMainGameContent()
         {
+            //clear registered events
+            player.CollideWithEnemy -= CollideWithEnemyTest;
+            player.DamageEnemy -= player.Damage;
+
+            mousePointer.SelectEnemy -= mousePointer.MouseSelectEntity;
+
+            foreach (EnemyGameObject enemy in enemies)
+            {
+                enemy.DamagePlayer -= HurtPlayerTest;
+                enemy.EnemyDies -= SpawnPotion;
+            }
+                        
             potions.Clear();
             enemies.Clear();
             player = null;
             entities.Clear();
             collisionManager = null;
             Commands = null;
+            ClearMapTypes();
             Resources.UnloadContent(Content);
             MediaPlayer.Stop();
 
@@ -332,6 +349,7 @@ namespace GameArchitectureEngine
             //    Mouse.SetPosition(Mouse.GetState().X, ScreenHeight);
 
             #endregion
+            base.UnloadContent();
         }
 
         public void UnloadGameOverContent()
@@ -435,7 +453,16 @@ namespace GameArchitectureEngine
         {
             spriteBatch.Begin(); //SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
             {
-                mapManager.Draw(currentMap, Resources.TileSheets[@"TileSheet/0"], spriteBatch);
+                //if (loadNewMap)
+                //{
+                //    //if (currentMapIndex < Resources.Maps.Count)
+                //    //    currentMap = Resources.Maps[string.Format("Maps/{0}", currentMapIndex)];
+                //    //else currentMap = Resources.Maps["Maps/0"];
+
+                //    loadNewMap = false;
+                //}
+
+                mapManager.Draw(currentMap, Resources.TileSheets["TileSheet/0"], spriteBatch);
 
                 entities = Utilities.SelectionSortList(entities);
 
@@ -486,10 +513,11 @@ namespace GameArchitectureEngine
 
         private void InitialiseBindings()
         {
-            Commands.AddKeyboardBindings(Keys.Escape, StopGame);
-            Commands.AddKeyboardBindings(Keys.Space, GoToNextScreen);
-            Commands.AddKeyboardBindings(Keys.N, GoToNextMap);
-            Commands.AddKeyboardBindings(Keys.S, SaveGame);
+            Commands.AddKeyboardBindings(Keys.Escape, OnStopGame);
+            Commands.AddKeyboardBindings(Keys.Space, OnGoToNextScreen);
+            Commands.AddKeyboardBindings(Keys.N, OnGoToNextMap);
+            Commands.AddKeyboardBindings(Keys.S, OnSaveGame);
+            Commands.AddKeyboardBindings(Keys.L, OnLoadGame);
 
             if (gameState == GameState.MainGameState)
             {
@@ -497,7 +525,7 @@ namespace GameArchitectureEngine
             }
         }
 
-        public void StopGame(eButtonState buttonState, Vector2 amount)
+        public void OnStopGame(eButtonState buttonState, Vector2 amount)
         {
             if (buttonState == eButtonState.PRESSED)
             {
@@ -510,13 +538,17 @@ namespace GameArchitectureEngine
             collisionManager.ClearCollidables();
 
             collisionManager.AddCollidable(player);
+
+            foreach (GameObjectBase col in entities)
+                collisionManager.AddCollidable(col);
+
             collisionManager.AddCollidable(mousePointer);
 
-            foreach (HealthPotionGameObject potion in potions)
-                collisionManager.AddCollidable(potion);
+            //foreach (HealthPotionGameObject potion in potions)
+            //    collisionManager.AddCollidable(potion);
 
-            foreach (EnemyGameObject enemy in enemies)
-                collisionManager.AddCollidable(enemy);
+            //foreach (EnemyGameObject enemy in enemies)
+            //    collisionManager.AddCollidable(enemy);
         }
 
         public void ResolveRemovals()
@@ -601,15 +633,14 @@ namespace GameArchitectureEngine
                 HealthPotionGameObject potion = new HealthPotionGameObject(enemy.Position);
                 potion.LoadContent(Resources);
 
-                //potions.Add(potion);
-                //entities.Add(potion);
+                potions.Add(potion);
+                entities.Add(potion);
                 GameInfo.Instance.HealthPotionInfoArray.Add(new HealthPotionInfo(enemy.Position));
 
                 InitialiseCollidableObjects();
             }
         }
         #endregion
-
 
         private void LoadMapTypes()
         {
@@ -638,7 +669,12 @@ namespace GameArchitectureEngine
             mapManager.AddMapTileTypes("EarthBR", (int)enumMapTileType.EarthBR, 320, 128);
         }
 
-        private void GoToNextScreen(eButtonState buttonState, Vector2 amount)
+        private void ClearMapTypes()
+        {
+            mapManager.ClearMapTypes();
+        }
+
+        private void OnGoToNextScreen(eButtonState buttonState, Vector2 amount)
         {
 
             if (buttonState == eButtonState.PRESSED)
@@ -648,30 +684,36 @@ namespace GameArchitectureEngine
             }
         }
 
-        private void GoToNextMap(eButtonState buttonState, Vector2 amount)
+        private void OnGoToNextMap(eButtonState buttonState, Vector2 amount)
         {
-                if (buttonState == eButtonState.PRESSED)
-                {
-                    currentMapIndex++;
+            if (buttonState == eButtonState.PRESSED)
+            {
+                loadNewMap = true;
 
-                    UnloadMainGameContent();
+                currentMapIndex++;
 
-                    InitialiseMainGameState();
+                if (currentMapIndex > Resources.Maps.Count)
+                    currentMapIndex = 0;
 
-                    LoadMainGameContent();
-                    spacePressed = true;
+                UnloadMainGameContent();
 
-                    nextMapCalled++;
+                InitialiseMainGameState();
+
+                LoadMainGameContent(true);
+                
+                nextMapCalled++;
             }         
         }
 
-        public void SaveGame(eButtonState buttonState, Vector2 amount)
+        public void OnSaveGame(eButtonState buttonState, Vector2 amount)
         {
-
             if (buttonState == eButtonState.PRESSED)
             {
                 GameInfo.Instance.PlayerInfo.Position = player.Position;
                 GameInfo.Instance.PlayerInfo.Health = player.Health;
+                GameInfo.Instance.PlayerInfo.AttackPower = player.AttackPower;
+
+                GameInfo.Instance.LevelIndex = currentMapIndex;
 
                 for (int i = 0; i < enemies.Count; i++)
                 {
@@ -686,6 +728,51 @@ namespace GameArchitectureEngine
 
                 Resources.WriteSaveFile(@"save.xml");
             }
-        }        
+        }
+        
+        public void OnLoadGame(eButtonState buttonState, Vector2 amount)
+        {
+            if (buttonState == eButtonState.PRESSED)
+            {
+                GameInfo.ClearGameInfoForLoading();
+
+                UnloadMainGameContent();
+
+                InitialiseMainGameState();
+
+                LoadGame("save.xml");
+            }
+        }
+
+        public void LoadGame(string filename)
+        {
+            Resources.ReadSaveFile(filename);
+
+            //Resources.LoadContent(Content, GraphicsDevice);
+            //LoadMapTypes();
+            //mousePointer.LoadContent(Resources);
+
+            Player.Position = GameInfo.Instance.PlayerInfo.Position;
+            Player.Health = GameInfo.Instance.PlayerInfo.Health;
+            player.AttackPower = GameInfo.Instance.PlayerInfo.AttackPower;
+
+            currentMapIndex = GameInfo.Instance.LevelIndex;
+
+            for (int i = 0; i < GameInfo.Instance.EnemyInfoArray.Count; i++)
+                enemies.Add(new EnemyGameObject(GameInfo.Instance.EnemyInfoArray[i].Position, player, GameInfo.Instance.EnemyInfoArray[i].Health, 100));
+
+            for (int i = 0; i < GameInfo.Instance.HealthPotionInfoArray.Count; i++)
+                potions.Add(new HealthPotionGameObject(GameInfo.Instance.HealthPotionInfoArray[i].Position));
+
+            for (int i = 0; i < GameInfo.Instance.TreeInfoArray.Count; i++)
+                trees.Add(new Tree(GameInfo.Instance.TreeInfoArray[i].Position));
+
+            for (int i = 0; i < GameInfo.Instance.RockInfoArray.Count; i++)
+                rocks.Add(new Rock(GameInfo.Instance.RockInfoArray[i].Position));
+
+            Player.IsAlive = true;
+
+            LoadMainGameContent(false);
+        }     
     }
 }

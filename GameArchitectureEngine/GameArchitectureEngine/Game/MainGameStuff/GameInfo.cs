@@ -6,12 +6,11 @@ using Microsoft.Xna.Framework;
 
 namespace GameArchitectureEngine
 {
-    
-
     public class PlayerInfo
     {
         public Vector2 Position = Vector2.Zero;
         public int Health = 0;
+        public int AttackPower = 0;
     }
 
     public class EnemyInfo
@@ -44,6 +43,16 @@ namespace GameArchitectureEngine
         }
     }
 
+    public class TreeInfo
+    {
+        public Vector2 Position = Vector2.Zero;
+    }
+
+    public class RockInfo
+    {
+        public Vector2 Position = Vector2.Zero;
+    }
+
     /// <summary>
     /// Creates a singleton instance of gameinfo
     /// which is loaded from a save file
@@ -67,5 +76,17 @@ namespace GameArchitectureEngine
         public PlayerInfo PlayerInfo;
         public List<EnemyInfo> EnemyInfoArray;        
         public List<HealthPotionInfo> HealthPotionInfoArray;
+        public List<TreeInfo> TreeInfoArray;
+        public List<RockInfo> RockInfoArray;
+        public int LevelIndex;
+
+        public static void ClearGameInfoForLoading()
+        {
+            mInstance.PlayerInfo = null;
+            mInstance.EnemyInfoArray.Clear();
+            mInstance.HealthPotionInfoArray.Clear();
+            mInstance.TreeInfoArray.Clear();
+            mInstance.RockInfoArray.Clear();
+        }
     }
 }

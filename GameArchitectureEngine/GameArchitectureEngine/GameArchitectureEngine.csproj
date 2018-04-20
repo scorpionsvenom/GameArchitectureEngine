@@ -90,6 +90,7 @@
     <Compile Include="Engine\FiniteStateMachine\State.cs" />
     <Compile Include="Engine\Utilities.cs" />
     <Compile Include="Game\Characters\MousePointer.cs" />
+    <Compile Include="Game\Environment\Environment.cs" />
     <Compile Include="Game\States\AI States\AttackState.cs" />
     <Compile Include="Game\States\AI States\ChaseState.cs" />
     <Compile Include="Game\Characters\EnemyGameObject.cs" />

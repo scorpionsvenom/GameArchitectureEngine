@@ -111,6 +111,11 @@ namespace GameArchitectureEngine
             usedValues.Add(mapValue);            
         }
 
+        public void ClearMapTypes()
+        {
+            mapTileTypes.Clear();
+        }
+
         struct MapTileType
         {
             public string Name;
