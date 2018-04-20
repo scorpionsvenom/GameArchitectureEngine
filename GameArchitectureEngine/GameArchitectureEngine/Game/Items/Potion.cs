@@ -7,13 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameArchitectureEngine
 {
-    public class HealthPotionGameObject : GameObjectBase
+    public class PotionGameObject : GameObjectBase
     {
-        public event CollisionHandler HealPlayer;
-
         public Collidable Collidable;
-        private Animation displayAnimation;
-        private AnimationPlayer sprite;
+        protected Animation displayAnimation;
+        protected AnimationPlayer sprite;
 
         private Rectangle localBounds;
 
@@ -28,10 +26,10 @@ namespace GameArchitectureEngine
             }
         }
 
-        public HealthPotionGameObject(Vector2 position)
-        {            
-            Position = position;
-        }
+        //public PotionGameObject(Vector2 position)
+        //{            
+        //    Position = position;
+        //}
 
         public override void Initialise()
         {
@@ -40,17 +38,12 @@ namespace GameArchitectureEngine
 
         public override void LoadContent(ResourceManager resources)
         {
-            displayAnimation = new Animation(resources.SpriteSheets["Sprites/Powerups/Potion"], 0.5f, true);
-            //sprite = new AnimationPlayer();
-            sprite.PlayAnimation(displayAnimation);
-
             int width = (int)(displayAnimation.FrameWidth * 0.4f);
             int left = (displayAnimation.FrameWidth - width) / 2;
             int height = (int)(displayAnimation.FrameHeight * 0.8);
             int top = displayAnimation.FrameHeight - height;
             localBounds = new Rectangle(left, top, width, height);
-
-            //Collidable = new Collidable();
+            
             BoundingBox = new Rectangle(BoundingRectangle.X, BoundingRectangle.Y, BoundingRectangle.Width, BoundingRectangle.Height);
         }
 
@@ -89,6 +82,53 @@ namespace GameArchitectureEngine
         public override void Reset(Vector2 position)
         {
             throw new NotImplementedException();
+        }
+
+        //public void OnHealPlayer()
+        //{
+        //    HealPlayer?.Invoke(this, new CollisionEventArgs(Position));
+        //}
+    }
+
+    public class StrengthPotion : PotionGameObject
+    {
+        //...embolden? really?
+        public event CollisionHandler EmboldenPlayer;
+
+        public StrengthPotion(Vector2 position)
+        {
+            Position = position;
+        }
+
+        public override void LoadContent(ResourceManager resources)
+        {
+            displayAnimation = new Animation(resources.SpriteSheets["Sprites/Powerups/AttackBoostPotion"], 0.5f, true);
+            sprite.PlayAnimation(displayAnimation);
+
+            base.LoadContent(resources);
+        }
+
+        public void OnEmboldenPlayer()
+        {
+            EmboldenPlayer?.Invoke(this, new CollisionEventArgs(Position));
+        }
+    }
+
+    public class HealthPotion : PotionGameObject
+    {
+        public event CollisionHandler HealPlayer;
+
+        public HealthPotion(Vector2 position)
+        {
+            Position = position;
+        }
+
+        public override void LoadContent(ResourceManager resources)
+        {
+            displayAnimation = new Animation(resources.SpriteSheets["Sprites/Powerups/Potion"], 0.5f, true);
+            sprite.PlayAnimation(displayAnimation);
+
+            base.LoadContent(resources);
         }
 
         public void OnHealPlayer()

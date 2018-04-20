@@ -313,20 +313,38 @@ namespace GameArchitectureEngine
             if (enemy != null && enemy == target)
             {                
                 isCloseEnoughToAttack = true;
+                return;
             }
 
-            HealthPotionGameObject potion = col as HealthPotionGameObject;
+            HealthPotion hPotion = col as HealthPotion;
 
-            if (potion != null && retrieveItem)
+            if (hPotion != null && retrieveItem)
             {
-                potion.flagForRemoval = true;
+                hPotion.flagForRemoval = true;
                 HealPlayer(50);
+                retrieveItem = false;
+                return;
+            }
+
+            StrengthPotion sPotion = col as StrengthPotion;
+
+            if (sPotion != null && retrieveItem)
+            {
+                sPotion.flagForRemoval = true;
+                EmboldenPlayer(2);
+                retrieveItem = false;
+                return;
             }
         }
 
         public void HealPlayer(int amount)
         {
             health = Math.Min(health + amount, maxHealth);
+        }
+
+        public void EmboldenPlayer(int multiplier)
+        {
+            AttackPower *= multiplier;
         }
 
         public void HurtPlayer(int amount)

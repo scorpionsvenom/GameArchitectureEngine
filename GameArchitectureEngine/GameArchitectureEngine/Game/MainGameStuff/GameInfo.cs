@@ -43,6 +43,21 @@ namespace GameArchitectureEngine
         }
     }
 
+    public class StrengthPotionInfo
+    {
+        public Vector2 Position = Vector2.Zero;
+
+        public StrengthPotionInfo()
+        {
+        }
+
+        public StrengthPotionInfo(Vector2 position)
+        {
+            Position = position;
+        }
+    }
+
+
     public class TreeInfo
     {
         public Vector2 Position = Vector2.Zero;
@@ -76,6 +91,7 @@ namespace GameArchitectureEngine
         public PlayerInfo PlayerInfo;
         public List<EnemyInfo> EnemyInfoArray;        
         public List<HealthPotionInfo> HealthPotionInfoArray;
+        public List<StrengthPotionInfo> StrengthPotionInfoArray;
         public List<TreeInfo> TreeInfoArray;
         public List<RockInfo> RockInfoArray;
         public int LevelIndex;
@@ -85,6 +101,7 @@ namespace GameArchitectureEngine
             mInstance.PlayerInfo = null;
             mInstance.EnemyInfoArray.Clear();
             mInstance.HealthPotionInfoArray.Clear();
+            mInstance.StrengthPotionInfoArray.Clear();
             mInstance.TreeInfoArray.Clear();
             mInstance.RockInfoArray.Clear();
         }

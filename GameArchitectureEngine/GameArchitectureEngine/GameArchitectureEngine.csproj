@@ -102,7 +102,7 @@
     <Compile Include="Engine\Resources\Map.cs" />
     <Compile Include="Engine\Resources\MapManager.cs" />
     <Compile Include="Engine\Input\MouseEventArgs.cs" />
-    <Compile Include="Game\Items\HealthPotionGameObject.cs" />
+    <Compile Include="Game\Items\Potion.cs" />
     <Compile Include="Game\States\AI States\IdleState.cs" />
     <Compile Include="Game\Characters\PlayerGameObject.cs" />
     <Compile Include="Game\States\AI States\DieState.cs" />

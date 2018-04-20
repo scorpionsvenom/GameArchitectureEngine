@@ -52,7 +52,7 @@ namespace GameArchitectureEngine
         public GameState gameState = GameState.IntroState;
 
         //Used for specific operations on these types of objects
-        private List<HealthPotionGameObject> potions = new List<HealthPotionGameObject>();
+        private List<PotionGameObject> potions = new List<PotionGameObject>();
         private List<EnemyGameObject> enemies = new List<EnemyGameObject>();
         private List<Tree> trees = new List<Tree>();
         private List<Rock> rocks = new List<Rock>();
@@ -200,13 +200,17 @@ namespace GameArchitectureEngine
 
             if (loadGameFromDefault)
             {
-                LoadGame(string.Format("Content/DefaultData/level{0}.xml", currentMapIndex));//LoadGame("save.xml");
+                LoadGame(string.Format("Content/DefaultData/level{0}.xml", currentMapIndex));
+            }
 
+            //Check the list of entities is empty to avoid populating twice
+            if (entities.Count == 0)
+            {
                 entities.Add(player);
                 foreach (EnemyGameObject enemy in enemies)
                     entities.Add(enemy);
 
-                foreach (HealthPotionGameObject potion in potions)
+                foreach (PotionGameObject potion in potions)
                     entities.Add(potion);
 
                 foreach (Tree tree in trees)
@@ -220,12 +224,11 @@ namespace GameArchitectureEngine
                     gameObject.LoadContent(Resources);
                 }
             }
-
             //TODO: manage Testings
             player.CollideWithEnemy += CollideWithEnemyTest;            
             player.DamageEnemy += player.Damage;
 
-            mousePointer.SelectEnemy += mousePointer.MouseSelectEntity;
+            //mousePointer.SelectEnemy += mousePointer.MouseSelectEntity;
 
             foreach (EnemyGameObject enemy in enemies)
             {
@@ -312,7 +315,7 @@ namespace GameArchitectureEngine
             player.CollideWithEnemy -= CollideWithEnemyTest;
             player.DamageEnemy -= player.Damage;
 
-            mousePointer.SelectEnemy -= mousePointer.MouseSelectEntity;
+            //mousePointer.SelectEnemy -= mousePointer.MouseSelectEntity;
 
             foreach (EnemyGameObject enemy in enemies)
             {
@@ -557,7 +560,7 @@ namespace GameArchitectureEngine
 
             for (int i = 0; i < entities.Count; i++)
             {
-                HealthPotionGameObject potion = entities[i] as HealthPotionGameObject;
+                PotionGameObject potion = entities[i] as PotionGameObject;
 
                 if (potion != null)
                 {
@@ -597,10 +600,10 @@ namespace GameArchitectureEngine
         }
 
         //TODO: wire this up
-        private void HealPlayerTest(object sender, EventArgs e)
-        {
-            player.HealPlayer(50);
-        }
+        //private void HealPlayerTest(object sender, EventArgs e)
+        //{
+        //    player.HealPlayer(50);
+        //}
 
         //private void CollideWithPotionTest(object sender, object passedInPotion, CollisionEventArgs e)
         //{
@@ -628,9 +631,16 @@ namespace GameArchitectureEngine
         {
             EnemyGameObject enemy = sender as EnemyGameObject;
 
-            if (enemy != null)
+            if (enemy != null && !enemy.droppedPotion)
             {
-                HealthPotionGameObject potion = new HealthPotionGameObject(enemy.Position);
+                int random = Utilities.Rand();
+                PotionGameObject potion;
+
+                if (random % 2 == 0)
+                    potion = new HealthPotion(enemy.Position);
+                else
+                    potion = new StrengthPotion(enemy.Position);
+
                 potion.LoadContent(Resources);
 
                 potions.Add(potion);
@@ -638,6 +648,8 @@ namespace GameArchitectureEngine
                 GameInfo.Instance.HealthPotionInfoArray.Add(new HealthPotionInfo(enemy.Position));
 
                 InitialiseCollidableObjects();
+
+                enemy.droppedPotion = true;
             }
         }
         #endregion
@@ -747,11 +759,7 @@ namespace GameArchitectureEngine
         public void LoadGame(string filename)
         {
             Resources.ReadSaveFile(filename);
-
-            //Resources.LoadContent(Content, GraphicsDevice);
-            //LoadMapTypes();
-            //mousePointer.LoadContent(Resources);
-
+            
             Player.Position = GameInfo.Instance.PlayerInfo.Position;
             Player.Health = GameInfo.Instance.PlayerInfo.Health;
             player.AttackPower = GameInfo.Instance.PlayerInfo.AttackPower;
@@ -762,7 +770,10 @@ namespace GameArchitectureEngine
                 enemies.Add(new EnemyGameObject(GameInfo.Instance.EnemyInfoArray[i].Position, player, GameInfo.Instance.EnemyInfoArray[i].Health, 100));
 
             for (int i = 0; i < GameInfo.Instance.HealthPotionInfoArray.Count; i++)
-                potions.Add(new HealthPotionGameObject(GameInfo.Instance.HealthPotionInfoArray[i].Position));
+                potions.Add(new HealthPotion(GameInfo.Instance.HealthPotionInfoArray[i].Position));
+
+            for (int i = 0; i < GameInfo.Instance.StrengthPotionInfoArray.Count; i++)
+                potions.Add(new StrengthPotion(GameInfo.Instance.StrengthPotionInfoArray[i].Position));
 
             for (int i = 0; i < GameInfo.Instance.TreeInfoArray.Count; i++)
                 trees.Add(new Tree(GameInfo.Instance.TreeInfoArray[i].Position));

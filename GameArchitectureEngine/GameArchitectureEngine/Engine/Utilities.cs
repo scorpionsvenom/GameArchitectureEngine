@@ -7,6 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameArchitectureEngine
 {
+    /// <summary>
+    /// This demonstrates the singleton design pattern
+    /// It provides a few useful functions used in the game.
+    /// </summary>
     public static class Utilities
     {
         private static Random random = new Random();

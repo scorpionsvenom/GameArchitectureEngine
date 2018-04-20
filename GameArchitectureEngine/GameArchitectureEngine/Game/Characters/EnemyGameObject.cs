@@ -136,7 +136,7 @@ namespace GameArchitectureEngine
             this.target = player;
         }
 
-        private bool droppedPotion = false;
+        public bool droppedPotion = false;
 
         public override void Initialise()
         {
@@ -333,7 +333,8 @@ namespace GameArchitectureEngine
             canAttack = false;
 
             EnemyDies?.Invoke(this, EventArgs.Empty);
-            droppedPotion = true;
+
+            droppedPotion = true;            
         }
     }
 }
