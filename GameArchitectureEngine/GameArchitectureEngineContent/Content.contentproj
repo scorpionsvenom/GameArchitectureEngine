@@ -206,24 +206,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DefaultData\save - Copy.xml">
-      <Name>save - Copy</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultData\save.txt">
-      <Name>save</Name>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="DefaultData\level0.xml">
       <Name>level0</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultData\save2.xml">
-      <Name>save2</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

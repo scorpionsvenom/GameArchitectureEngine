@@ -5,9 +5,12 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameArchitectureEngine", "GameArchitectureEngine\GameArchitectureEngine\GameArchitectureEngine.csproj", "{9B86AFF2-A007-4F73-BC06-EE7BDC9F1269}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "Content", "GameArchitectureEngine\GameArchitectureEngineContent\Content.contentproj", "{FE596104-FE64-41E1-BCF6-6104B427A158}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content", "GameArchitectureEngine\GameArchitectureEngineContent\Content.contentproj", "{FE596104-FE64-41E1-BCF6-6104B427A158}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86

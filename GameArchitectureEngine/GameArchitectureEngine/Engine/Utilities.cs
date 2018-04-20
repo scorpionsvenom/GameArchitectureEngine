@@ -39,7 +39,7 @@ namespace GameArchitectureEngine
             {
                 min_index = i;
 
-                for (int j = i + i; j < listToSort.Count; j++)
+                for (int j = i + 1; j < listToSort.Count; j++)
                 {
                     if (listToSort[j].Depth < listToSort[min_index].Depth)
                         min_index = j;
